@@ -253,7 +253,7 @@ export class SettingsManager {
       .setName(t('Celebrate completions'))
       .setDesc(
         t(
-          'When toggled, completing a card (via its checkbox or by moving it to a list marked "Mark items as complete") occasionally shows a flying unicorn.'
+          'When toggled, completing a card (via its checkbox or by moving it to a list marked "Done") occasionally shows a flying unicorn.'
         )
       )
       .then((setting) => {
