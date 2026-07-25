@@ -94,7 +94,8 @@ export function bindMarkdownEvents(view: KanbanView) {
 
     if (!link.href || link.href.contains(' ')) return;
     try {
-      new URL(link.href);
+      const url = new URL(link.href);
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
     } catch {
       return;
     }
