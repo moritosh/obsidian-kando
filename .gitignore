@@ -1,0 +1,17 @@
+# Intellij
+*.iml
+.idea
+
+# npm
+node_modules
+package-lock.json
+
+# build
+.DS_Store
+*.js.map
+.env
+yarn*
+dist
+test-vault/
+main.js
+styles.css
