@@ -1,6 +1,6 @@
 {
   "name": "obsidian-kando",
-  "version": "2.0.51",
+  "version": "1.0.0",
   "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
   "main": "main.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "release": "git commit -m $npm_package_version && git tag $npm_package_version && git push && git push --tags"
   },
   "keywords": [],
-  "author": "",
+  "author": "moritosh",
   "license": "MIT",
   "devDependencies": {
     "@codemirror/commands": "^6.0.0",

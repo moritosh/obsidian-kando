@@ -99,17 +99,14 @@ const replace = (options = {}) => {
 };
 
 const isProd = process.argv[2] === 'production';
-const renamePlugin = {
-  name: 'rename-styles',
+const OUT_DIR = './build/obsidian-kando';
+
+const copyManifestPlugin = {
+  name: 'copy-manifest',
   setup(build) {
     build.onEnd(() => {
-      const { outfile } = build.initialOptions;
-      const outcss = outfile.replace(/\.js$/, '.css');
-      const fixcss = outfile.replace(/main\.js$/, 'styles.css');
-      if (fs.existsSync(outcss)) {
-        console.log('Renaming', outcss, 'to', fixcss);
-        fs.renameSync(outcss, fixcss);
-      }
+      fs.mkdirSync(OUT_DIR, { recursive: true });
+      fs.copyFileSync('./manifest.json', path.join(OUT_DIR, 'manifest.json'));
     });
   },
 };
@@ -218,6 +215,7 @@ const context = await esbuild.context({
         cancelAnimationFrame: 'activeWindow.cancelAnimationFrame',
       },
     }),
+    copyManifestPlugin,
   ],
   external: [
     'obsidian',
@@ -251,7 +249,7 @@ const context = await esbuild.context({
   logLevel: 'info',
   sourcemap: isProd ? false : 'inline',
   treeShaking: true,
-  outdir: './',
+  outdir: OUT_DIR,
   minify: isProd,
 });
 

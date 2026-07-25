@@ -1,11 +1,10 @@
 {
 	"id": "obsidian-kando",
 	"name": "Kando",
-	"version": "2.0.51",
+	"version": "1.0.0",
 	"minAppVersion": "1.0.0",
 	"description": "Create markdown-backed Kanban boards in Obsidian.",
-	"author": "mgmeyers",
-	"authorUrl": "https://github.com/mgmeyers/obsidian-kanban",
-	"helpUrl": "https://publish.obsidian.md/kanban/Obsidian+Kanban+Plugin",
+	"author": "moritosh",
+	"authorUrl": "https://github.com/moritosh/obsidian-kando",
 	"isDesktopOnly": false
 }

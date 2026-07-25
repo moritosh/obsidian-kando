@@ -13,5 +13,6 @@ package-lock.json
 yarn*
 dist
 test-vault/
+build/
 main.js
 styles.css
