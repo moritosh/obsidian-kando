@@ -164,7 +164,7 @@ export function getScrollIntersection(
   entities: Entity[],
   target: Hitbox,
   dragEntity: Entity
-): [Entity, number] {
+): [Entity, number] | null {
   const primary = getBestIntersect(entities, target, dragEntity);
 
   if (!primary) return null;

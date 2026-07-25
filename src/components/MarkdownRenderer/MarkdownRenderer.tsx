@@ -21,22 +21,25 @@ interface MarkdownRendererProps extends HTMLAttributes<HTMLDivElement> {
   entityId?: string;
 }
 
-function colorizeTags(wrapperEl: HTMLElement, getTagColor: (tag: string) => TagColor) {
+function colorizeTags(wrapperEl: HTMLElement, getTagColor: (tag: string) => TagColor | null) {
   if (!wrapperEl) return;
   const tagEls = wrapperEl.querySelectorAll<HTMLAnchorElement>('a.tag');
   if (!tagEls?.length) return;
 
   tagEls.forEach((a) => {
-    const color = getTagColor(a.getAttr('href'));
+    const color = getTagColor(a.getAttr('href')!);
     if (!color) return;
     a.setCssProps({
-      '--tag-color': color.color,
-      '--tag-background': color.backgroundColor,
+      '--tag-color': color.color ?? '',
+      '--tag-background': color.backgroundColor ?? '',
     });
   });
 }
 
-function colorizeDates(wrapperEl: HTMLElement, getDateColor: (date: moment.Moment) => DateColor) {
+function colorizeDates(
+  wrapperEl: HTMLElement,
+  getDateColor: (date: moment.Moment) => DateColor | null
+) {
   if (!wrapperEl) return;
   const dateEls = wrapperEl.querySelectorAll<HTMLElement>('.' + c('date'));
   if (!dateEls?.length) return;
@@ -49,17 +52,17 @@ function colorizeDates(wrapperEl: HTMLElement, getDateColor: (date: moment.Momen
     el.toggleClass('has-background', !!color?.backgroundColor);
     if (!color) return;
     el.setCssProps({
-      '--date-color': color.color,
-      '--date-background-color': color.backgroundColor,
+      '--date-color': color.color ?? '',
+      '--date-background-color': color.backgroundColor ?? '',
     });
   });
 }
 
 export class BasicMarkdownRenderer extends Component {
   containerEl: HTMLElement;
-  wrapperEl: HTMLElement;
+  wrapperEl!: HTMLElement;
   renderCapability: PromiseCapability;
-  observer: ResizeObserver;
+  observer!: ResizeObserver;
   isVisible: boolean = false;
   mark: Mark;
 
@@ -92,7 +95,7 @@ export class BasicMarkdownRenderer extends Component {
       this.view.app,
       this.markdown,
       this.containerEl,
-      this.view.file.path,
+      this.view.file!.path,
       this
     );
 
@@ -107,7 +110,7 @@ export class BasicMarkdownRenderer extends Component {
     this.observer = new ResizeObserver((entries) => {
       if (!entries.length) return;
 
-      const entry = entries.first().contentBoxSize[0];
+      const entry = entries.first()!.contentBoxSize[0];
       if (entry.blockSize === 0) return;
 
       if (this.wrapperEl) {
@@ -131,9 +134,9 @@ export class BasicMarkdownRenderer extends Component {
       (evt) => {
         const { targetNode } = evt;
         if (
-          targetNode.instanceOf(HTMLElement) &&
-          targetNode.hasClass('task-list-item-checkbox') &&
-          !targetNode.closest('.markdown-embed')
+          targetNode!.instanceOf(HTMLElement) &&
+          targetNode!.hasClass('task-list-item-checkbox') &&
+          !targetNode!.closest('.markdown-embed')
         ) {
           evt.preventDefault();
           evt.stopPropagation();
@@ -146,7 +149,7 @@ export class BasicMarkdownRenderer extends Component {
       'contextmenu',
       (evt) => {
         const { targetNode } = evt;
-        if (targetNode.instanceOf(HTMLElement) && targetNode.hasClass('task-list-item-checkbox')) {
+        if (targetNode!.instanceOf(HTMLElement) && targetNode!.hasClass('task-list-item-checkbox')) {
           evt.preventDefault();
           evt.stopPropagation();
         }
@@ -206,7 +209,7 @@ export class BasicMarkdownRenderer extends Component {
       if (!href) continue;
 
       const path = getLinkpath(href);
-      const file = view.app.metadataCache.getFirstLinkpathDest(path, view.file.path);
+      const file = view.app.metadataCache.getFirstLinkpathDest(path, view.file!.path);
       internalLinkEl.toggleClass('is-unresolved', !file);
     }
   }
@@ -234,7 +237,7 @@ export const MarkdownRenderer = memo(function MarkdownPreviewRenderer({
   const getDateColor = useGetDateColorFn(stateManager);
 
   const renderer = useRef<BasicMarkdownRenderer>();
-  const elRef = useRef<HTMLDivElement>();
+  const elRef = useRef<HTMLDivElement>(null);
 
   // Reset virtualization if this entity is a managed entity and has changed sort order
   useEffect(() => {
@@ -268,7 +271,7 @@ export const MarkdownRenderer = memo(function MarkdownPreviewRenderer({
       const preview = renderer.current;
       if (!preview || !entityManager?.parent) return;
 
-      const { dragManager } = dndManager;
+      const { dragManager } = dndManager!;
       if (dragManager.dragEntityId === entityManager.entityId) return;
       if (dragManager.dragEntityId === entityManager.parent.entityId) return;
 
@@ -280,25 +283,25 @@ export const MarkdownRenderer = memo(function MarkdownPreviewRenderer({
     };
 
     if (entityId && view.previewCache.has(entityId)) {
-      const preview = view.previewCache.get(entityId);
+      const preview = view.previewCache.get(entityId)!;
 
       renderer.current = preview;
-      preview.migrate(elRef.current);
+      preview.migrate(elRef.current!);
 
       entityManager?.emitter.on('visibility-change', onVisibilityChange);
       return () => entityManager?.emitter.off('visibility-change', onVisibilityChange);
     }
 
     const markdownRenderer = new BasicMarkdownRenderer(view, markdownString);
-    markdownRenderer.wrapperEl = elRef.current;
+    markdownRenderer.wrapperEl = elRef.current!;
 
     const preview = (renderer.current = view.addChild(markdownRenderer));
     if (entityId) view.previewCache.set(entityId, preview);
 
-    elRef.current.empty();
-    elRef.current.append(preview.containerEl);
-    colorizeTags(elRef.current, getTagColor);
-    colorizeDates(elRef.current, getDateColor);
+    elRef.current!.empty();
+    elRef.current!.append(preview.containerEl);
+    colorizeTags(elRef.current!, getTagColor);
+    colorizeDates(elRef.current!, getDateColor);
 
     entityManager?.emitter.on('visibility-change', onVisibilityChange);
 
@@ -317,15 +320,15 @@ export const MarkdownRenderer = memo(function MarkdownPreviewRenderer({
 
     preview.set(markdownString);
     preview.renderCapability.promise.then(() => {
-      colorizeTags(elRef.current, getTagColor);
-      colorizeDates(elRef.current, getDateColor);
+      colorizeTags(elRef.current!, getTagColor);
+      colorizeDates(elRef.current!, getDateColor);
     });
   }, [markdownString]);
 
   useEffect(() => {
     if (!renderer.current) return;
-    colorizeTags(elRef.current, getTagColor);
-    colorizeDates(elRef.current, getDateColor);
+    colorizeTags(elRef.current!, getTagColor);
+    colorizeDates(elRef.current!, getDateColor);
   }, [getTagColor, getDateColor]);
 
   useEffect(() => {
@@ -345,8 +348,8 @@ export const MarkdownRenderer = memo(function MarkdownPreviewRenderer({
   }, []);
 
   let styles: CSSProperties | undefined = undefined;
-  if (!renderer.current && view.previewCache.has(entityId)) {
-    const preview = view.previewCache.get(entityId);
+  if (!renderer.current && view.previewCache.has(entityId!)) {
+    const preview = view.previewCache.get(entityId!)!;
     if (preview.lastRefHeight > 0) {
       styles = {
         width: `${preview.lastRefWidth}px`,
@@ -371,8 +374,8 @@ export const MarkdownClonedPreviewRenderer = memo(function MarkdownClonedPreview
   ...divProps
 }: MarkdownRendererProps) {
   const { view } = useContext(KanbanContext);
-  const elRef = useRef<HTMLDivElement>();
-  const preview = view.previewCache.get(entityId);
+  const elRef = useRef<HTMLDivElement>(null);
+  const preview = view.previewCache.get(entityId!);
 
   let styles: CSSProperties | undefined = undefined;
   if (preview && preview.lastRefHeight > 0) {

@@ -1,4 +1,5 @@
-import { EditorSuggestContext, moment } from 'obsidian';
+import { EditorSuggestContext } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 import { StateManager } from 'src/StateManager';
 import { buildLinkToDailyNote } from 'src/helpers';
 
@@ -16,7 +17,7 @@ export function applyDate(ctx: EditorSuggestContext, stateManager: StateManager,
     ? buildLinkToDailyNote(stateManager.app, formattedDate)
     : `{${formattedDate}} `;
 
-  const start = { line: ctx.start.line, ch: ctx.start.ch + dateTrigger.length };
+  const start = { line: ctx.start.line, ch: ctx.start.ch + dateTrigger!.length };
 
   ctx.editor.replaceRange(wrappedDate, start, ctx.end);
   ctx.editor.setCursor({

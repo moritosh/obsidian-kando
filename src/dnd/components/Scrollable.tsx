@@ -40,7 +40,7 @@ export function Scrollable({ scrollRef, triggerTypes, children }: ScrollContextP
 
   useOnMount(
     [scrollRef],
-    () => managerRef.current?.initNodes(scrollRef.current),
+    () => managerRef.current?.initNodes(scrollRef.current!),
     () => managerRef.current?.destroy()
   );
 

@@ -18,7 +18,7 @@ interface ItemFormProps {
 
 export function ItemForm({ addItems, editState, setEditState, hideButton }: ItemFormProps) {
   const { stateManager } = useContext(KanbanContext);
-  const editorRef = useRef<EditorView>();
+  const editorRef = useRef<EditorView | null>(null);
 
   const clear = () => setEditState(EditingState.cancel);
   const clickOutsideRef = useOnclickOutside(clear, {
@@ -53,6 +53,7 @@ export function ItemForm({ addItems, editState, setEditState, hideButton }: Item
                 createItem(cm.state.doc.toString());
                 return true;
               }
+              return false;
             }}
             onSubmit={(cm) => {
               createItem(cm.state.doc.toString());
@@ -72,7 +73,7 @@ export function ItemForm({ addItems, editState, setEditState, hideButton }: Item
         className={c('new-item-button')}
         onClick={() => setEditState({ x: 0, y: 0 })}
         onDragOver={(e) => {
-          if (getDropAction(stateManager, e.dataTransfer)) {
+          if (getDropAction(stateManager, e.dataTransfer!)) {
             setEditState({ x: 0, y: 0 });
           }
         }}

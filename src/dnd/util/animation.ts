@@ -17,7 +17,7 @@ export function rafThrottle<T extends any[]>(
   fn: (...args: T) => void
 ): ThrottledFn<T> {
   let lastArgs: T;
-  let frameId: number;
+  let frameId: number | null;
 
   const wrapperFn: ThrottledFn<T> = (...args: T) => {
     lastArgs = args;

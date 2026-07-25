@@ -27,7 +27,7 @@ export class SortManager {
   shifted: Set<string>;
   hidden: Set<string>;
   isSorting: boolean;
-  isPlaceholderActive: boolean;
+  isPlaceholderActive: boolean = false;
   axis: Axis;
   placeholder: EntityAndElement | null;
   instanceId: string;
@@ -134,7 +134,7 @@ export class SortManager {
     if (this.shifted.size > 0) {
       this.shifted.forEach((entityId) => {
         if (this.sortables.has(entityId)) {
-          const [, el] = this.sortables.get(entityId);
+          const [, el] = this.sortables.get(entityId)!;
           this.resetEl(el, shiftTransition);
         }
       });
@@ -145,7 +145,7 @@ export class SortManager {
     if (!maintainHidden && this.hidden.size > 0) {
       this.hidden.forEach((entityId) => {
         if (this.sortables.has(entityId)) {
-          const [, , measure] = this.sortables.get(entityId);
+          const [, , measure] = this.sortables.get(entityId)!;
           this.resetEl(measure, shiftTransition);
         }
       });
@@ -182,7 +182,7 @@ export class SortManager {
       if (primaryIntersection && dragEntity) {
         const dropHitbox = primaryIntersection?.getHitbox() || dragOriginHitbox;
         const dropDuration = getDropDuration({
-          position: dragPosition,
+          position: dragPosition!,
           destination: {
             x: dropHitbox[0],
             y: dropHitbox[1],
@@ -319,10 +319,10 @@ export class SortManager {
   handleDragLeave = ({ dragEntity, primaryIntersection }: DragEventData) => {
     if (!this.isSorting) return;
 
-    const { acceptsSort } = primaryIntersection.getData();
-    const inDroparea = acceptsSort && !acceptsSort.includes(dragEntity.getData().type);
+    const { acceptsSort } = primaryIntersection!.getData();
+    const inDroparea = acceptsSort && !acceptsSort.includes(dragEntity!.getData().type);
     if (inDroparea) {
-      const sortable = this.sortables.get(primaryIntersection.entityId);
+      const sortable = this.sortables.get(primaryIntersection!.entityId);
       if (sortable) sortable[2].removeClass('is-dropping');
     }
 

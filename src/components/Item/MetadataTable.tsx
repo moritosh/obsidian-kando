@@ -1,6 +1,7 @@
 import classcat from 'classcat';
 import { isPlainObject } from 'is-plain-object';
-import { TFile, moment } from 'obsidian';
+import { TFile } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 import { getAPI } from 'obsidian-dataview';
 import { ComponentChild } from 'preact';
 import { memo, useContext, useMemo } from 'preact/compat';
@@ -20,7 +21,7 @@ export interface ItemMetadataProps {
 }
 
 function mergeMetadata(
-  fileMetadata: FileMetadata,
+  fileMetadata: FileMetadata | undefined,
   inlineMetadata: InlineField[] = [],
   metadataKeys: DataKey[]
 ) {
@@ -81,7 +82,7 @@ interface MetadataValueProps {
 }
 
 export function getDateFromObj(v: any, stateManager: StateManager) {
-  let m: moment.Moment;
+  let m: moment.Moment | undefined;
 
   if (v.ts) {
     m = moment(v.ts);
@@ -107,7 +108,7 @@ export function getLinkFromObj(v: any, view: KanbanView) {
 
   const file = app.vault.getAbstractFileByPath(v.path);
   if (file && file instanceof TFile) {
-    const link = app.fileManager.generateMarkdownLink(file, view.file.path, v.subpath, v.display);
+    const link = app.fileManager.generateMarkdownLink(file, view.file!.path, v.subpath, v.display);
     return `${v.embed && link[0] !== '!' ? '!' : ''}${link}`;
   }
 
@@ -131,7 +132,7 @@ function getDate(v: any) {
 export function anyToString(v: any, stateManager: StateManager): string {
   if (isPlainObject(v) && v.value) v = v.value;
   const date = getDate(v);
-  if (date) return getDateFromObj(date, stateManager);
+  if (date) return getDateFromObj(date, stateManager) ?? '';
   if (typeof v === 'string') return v;
   if (v instanceof TFile) return v.path;
   if (Array.isArray(v)) {
@@ -176,10 +177,12 @@ export function MetadataValue({ data, dateLabel, searchQuery }: MetadataValuePro
             'has-background': dateColor?.backgroundColor,
           })}
           style={
-            dateColor && {
-              '--date-color': dateColor.color,
-              '--date-background-color': dateColor.backgroundColor,
-            }
+            dateColor
+              ? {
+                  '--date-color': dateColor.color,
+                  '--date-background-color': dateColor.backgroundColor,
+                }
+              : undefined
           }
         >
           {!!dateLabel && <span className={c('item-metadata-date-label')}>{dateLabel}</span>}
@@ -236,7 +239,7 @@ export const MetadataTable = memo(function MetadataTable({
           const data = metadata[k];
           if (!data) return null;
 
-          const isSearchMatch = (data.label || k).toLocaleLowerCase().contains(searchQuery);
+          const isSearchMatch = (data.label || k).toLocaleLowerCase().contains(searchQuery!);
           return (
             <tr key={k} className={c('meta-row')}>
               {!data.shouldHideLabel && (

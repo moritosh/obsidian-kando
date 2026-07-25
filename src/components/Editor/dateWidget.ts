@@ -9,7 +9,7 @@ import {
   ViewUpdate,
   WidgetType,
 } from '@codemirror/view';
-import { moment } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 
 import { StateManager } from '../../StateManager';
 import { escapeRegExpStr } from '../helpers';
@@ -94,7 +94,6 @@ function decorate(type: 'date' | 'time') {
 class DateDecorator {
   decos: DecorationSet;
   decorator: MatchDecorator;
-  type: string;
   constructor(view: EditorView, regexp: RegExp, type: 'date' | 'time') {
     this.decorator = new MatchDecorator({
       regexp,
@@ -119,8 +118,8 @@ const config: PluginSpec<DateDecorator> = {
 
 function create(type: 'date' | 'time', reStr: string) {
   return ViewPlugin.define((view) => {
-    const stateManager = view.state.field(stateManagerField);
-    const dateTrigger = stateManager.getSetting(type === 'date' ? 'date-trigger' : 'time-trigger');
+    const stateManager = view.state.field(stateManagerField)!;
+    const dateTrigger = stateManager.getSetting(type === 'date' ? 'date-trigger' : 'time-trigger')!;
     return new DateDecorator(
       view,
       new RegExp(`${escapeRegExpStr(dateTrigger)}${reStr}`, 'g'),

@@ -57,7 +57,7 @@ export function bindMarkdownEvents(view: KanbanView) {
     if (!link) return;
 
     evt.preventDefault();
-    app.workspace.openLinkText(link.href, view.file.path, Keymap.isModEvent(evt));
+    app.workspace.openLinkText(link.href, view.file!.path, Keymap.isModEvent(evt));
   };
 
   contentEl.on('click', 'a.internal-link', onLinkClick);
@@ -71,7 +71,7 @@ export function bindMarkdownEvents(view: KanbanView) {
 
     const menu = new Menu();
     (menu as any).addSections(['title', 'open', 'action', 'view', 'info', '', 'danger']);
-    (app.workspace as any).handleLinkContextMenu(menu, link.href, view.file.path);
+    (app.workspace as any).handleLinkContextMenu(menu, link.href, view.file!.path);
     menu.showAtMouseEvent(evt);
   });
   contentEl.on('mouseover', 'a.internal-link', (evt: MouseEvent, targetEl: HTMLElement) => {
@@ -83,7 +83,7 @@ export function bindMarkdownEvents(view: KanbanView) {
       hoverParent: view,
       targetEl,
       linktext: link.href,
-      sourcePath: view.file.path,
+      sourcePath: view.file!.path,
     });
   });
   contentEl.on('click', 'a.external-link', (evt: MouseEvent, targetEl: HTMLElement) => {
@@ -127,7 +127,7 @@ export function bindMarkdownEvents(view: KanbanView) {
 
     const tag = targetEl.getText();
     const searchPlugin = (app as any).internalPlugins.getPluginById('global-search');
-    const stateManager = view.plugin.getStateManager(view.file);
+    const stateManager = view.plugin.getStateManager(view.file!)!;
     const tagAction = stateManager.getSetting('tag-action');
 
     if (tagAction === 'kanban') {

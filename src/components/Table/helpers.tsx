@@ -3,7 +3,6 @@ import {
   ColumnDef,
   FilterFn,
   OnChangeFn,
-  SortingFn,
   SortingState,
   createColumnHelper,
 } from '@tanstack/react-table';
@@ -39,7 +38,7 @@ export const fuzzyAnyFilter: FilterFn<TableItem> = (row, columnId, search, addMe
   return itemRank.passed;
 };
 
-export const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
+export const fuzzySort = (rowA: any, rowB: any, columnId: string): number | null => {
   if (!rowA.columnFiltersMeta[columnId] && !rowB.columnFiltersMeta[columnId]) return null;
   if (!rowA.columnFiltersMeta[columnId]) return -1;
   if (!rowB.columnFiltersMeta[columnId]) return 1;
@@ -58,7 +57,7 @@ export function useTableData(board: Board, stateManager: StateManager): TableDat
     const inlineMetadata: Set<string> = new Set();
     const metadataLabels: Map<string, string> = new Map();
     const lanes: Lane[] = board?.children || [];
-    const metadataKeys = stateManager.getSetting('metadata-keys');
+    const metadataKeys = stateManager.getSetting('metadata-keys') ?? [];
     const moveInlineMetadata = stateManager.getSetting('inline-metadata-position') !== 'body';
 
     for (let i = 0, len = lanes.length; i < len; i++) {
@@ -161,9 +160,10 @@ export function useTableColumns(boardData: Board, stateManager: StateManager) {
 
   const desc = useRef<boolean>(false);
   const setSorting = useCallback<OnChangeFn<SortingState>>(
-    (onChange: (old: SortingState) => SortingState) => {
+    (updaterOrValue) => {
       setSortingRaw((old) => {
-        const newState = onChange(old);
+        const newState =
+          typeof updaterOrValue === 'function' ? updaterOrValue(old) : updaterOrValue;
         if (newState.length) desc.current = newState[0].desc;
         return newState;
       });
@@ -194,7 +194,7 @@ export function useTableColumns(boardData: Board, stateManager: StateManager) {
                   return (
                     <DateCell
                       item={info.row.original}
-                      shouldShowRelativeDate={shouldShowRelativeDate}
+                      shouldShowRelativeDate={!!shouldShowRelativeDate}
                       hideDateDisplay={!moveDates}
                     />
                   );

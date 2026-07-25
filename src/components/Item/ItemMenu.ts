@@ -99,7 +99,7 @@ export function useItemMenu({
             .onClick(() => {
               if (item.data.blockId) {
                 navigator.clipboard.writeText(
-                  `${this.app.fileManager.generateMarkdownLink(
+                  `${stateManager.app.fileManager.generateMarkdownLink(
                     stateManager.file,
                     '',
                     '#^' + item.data.blockId
@@ -109,7 +109,7 @@ export function useItemMenu({
                 const id = generateInstanceId(6);
 
                 navigator.clipboard.writeText(
-                  `${this.app.fileManager.generateMarkdownLink(stateManager.file, '', '#^' + id)}`
+                  `${stateManager.app.fileManager.generateMarkdownLink(stateManager.file, '', '#^' + id)}`
                 );
 
                 boardModifiers.updateItem(
@@ -191,7 +191,7 @@ export function useItemMenu({
             .setTitle(hasDate ? t('Edit date') : t('Add date'))
             .onClick(() => {
               constructDatePicker(
-                e.view,
+                e.view!,
                 stateManager,
                 coordinates,
                 constructMenuDatePickerOnChange({
@@ -231,7 +231,7 @@ export function useItemMenu({
             .setTitle(hasTime ? t('Edit time') : t('Add time'))
             .onClick(() => {
               constructTimePicker(
-                e.view,
+                e.view!,
                 stateManager,
                 coordinates,
                 constructMenuTimePickerOnChange({

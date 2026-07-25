@@ -1,5 +1,5 @@
 import update from 'immutability-helper';
-import { moment } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 import { KanbanView } from 'src/KanbanView';
 import { StateManager } from 'src/StateManager';
 import { Path } from 'src/dnd/types';
@@ -94,7 +94,7 @@ export function getBoardModifiers(view: KanbanView, stateManager: StateManager):
     addLane: (lane: Lane) => {
       stateManager.setState((boardData) => {
         const collapseState = view.getViewState('list-collapse') || [];
-        const op = (collapseState: boolean[]) => {
+        const op = (collapseState: boolean[] = []) => {
           const newState = [...collapseState];
           newState.push(false);
           return newState;
@@ -110,9 +110,9 @@ export function getBoardModifiers(view: KanbanView, stateManager: StateManager):
     insertLane: (path: Path, lane: Lane) => {
       stateManager.setState((boardData) => {
         const collapseState = view.getViewState('list-collapse');
-        const op = (collapseState: boolean[]) => {
+        const op = (collapseState: boolean[] = []) => {
           const newState = [...collapseState];
-          newState.splice(path.last(), 0, false);
+          newState.splice(path.last()!, 0, false);
           return newState;
         };
 
@@ -143,9 +143,9 @@ export function getBoardModifiers(view: KanbanView, stateManager: StateManager):
 
         try {
           const collapseState = view.getViewState('list-collapse');
-          const op = (collapseState: boolean[]) => {
+          const op = (collapseState: boolean[] = []) => {
             const newState = [...collapseState];
-            newState.splice(path.last(), 1);
+            newState.splice(path.last()!, 1);
             return newState;
           };
           view.setViewState('list-collapse', undefined, op);
@@ -202,9 +202,9 @@ export function getBoardModifiers(view: KanbanView, stateManager: StateManager):
 
         if (entity.type === DataTypes.Lane) {
           const collapseState = view.getViewState('list-collapse');
-          const op = (collapseState: boolean[]) => {
+          const op = (collapseState: boolean[] = []) => {
             const newState = [...collapseState];
-            newState.splice(path.last(), 1);
+            newState.splice(path.last()!, 1);
             return newState;
           };
           view.setViewState('list-collapse', undefined, op);
@@ -261,9 +261,9 @@ export function getBoardModifiers(view: KanbanView, stateManager: StateManager):
 
         if (entity.type === DataTypes.Lane) {
           const collapseState = view.getViewState('list-collapse');
-          const op = (collapseState: boolean[]) => {
+          const op = (collapseState: boolean[] = []) => {
             const newState = [...collapseState];
-            newState.splice(path.last(), 0, collapseState[path.last()]);
+            newState.splice(path.last()!, 0, collapseState[path.last()!]);
             return newState;
           };
           view.setViewState('list-collapse', undefined, op);

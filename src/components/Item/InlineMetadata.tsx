@@ -20,7 +20,7 @@ interface InlineMetadataProps {
 
 export function InlineMetadata({ item, stateManager }: InlineMetadataProps) {
   const search = useContext(SearchContext);
-  const metaKeys = stateManager.getSetting('metadata-keys');
+  const metaKeys = stateManager.getSetting('metadata-keys') ?? [];
   const showInlineMetadata = stateManager.useSetting('inline-metadata-position') === 'footer';
   const showTaskMetadata = stateManager.useSetting('move-task-metadata');
   const { inlineMetadata } = item.data.metadata;
@@ -50,7 +50,7 @@ export function InlineMetadata({ item, stateManager }: InlineMetadataProps) {
         if (explicitLabel && !isTaskMetadata) {
           label = explicitLabel;
         } else {
-          label = isEmoji ? lableToIcon(key, value) : lableToName(key);
+          label = (isEmoji ? lableToIcon(key, value) : lableToName(key)) ?? '';
         }
 
         if (!isEmoji) label += ': ';

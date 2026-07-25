@@ -1,6 +1,5 @@
 import update from 'immutability-helper';
-import { Content, List, Parent, Root } from 'mdast';
-import { ListItem } from 'mdast-util-from-markdown/lib';
+import { Content, List, ListItem, Parent, Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import { stringifyYaml } from 'obsidian';
 import { KanbanSettings } from 'src/Settings';
@@ -30,7 +29,7 @@ import {
   getStringFromBoundary,
 } from '../helpers/ast';
 import { hydrateItem, preprocessTitle } from '../helpers/hydrateBoard';
-import { extractInlineFields, taskFields } from '../helpers/inlineMetadata';
+import { InlineField, extractInlineFields, taskFields } from '../helpers/inlineMetadata';
 import {
   addBlockId,
   dedentNewLines,
@@ -52,17 +51,19 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
   const moveTags = stateManager.getSetting('move-tags');
   const moveDates = stateManager.getSetting('move-dates');
 
-  const startNode = item.children.first();
-  const endNode = item.children.last();
+  // A list item always has at least one child (the checkbox content), so
+  // these are never actually empty/undefined at runtime.
+  const startNode = item.children.first()!;
+  const endNode = item.children.last()!;
 
   const start =
     startNode.type === 'paragraph'
-      ? getNodeContentBoundary(startNode).start
-      : startNode.position.start.offset;
+      ? getNodeContentBoundary(startNode)!.start
+      : startNode.position!.start.offset!;
   const end =
     endNode.type === 'paragraph'
-      ? getNodeContentBoundary(endNode).end
-      : endNode.position.end.offset;
+      ? getNodeContentBoundary(endNode)!.end
+      : endNode.position!.end.offset!;
   const itemBoundary: ContentBoundary = { start, end };
 
   let itemContent = getStringFromBoundary(md, itemBoundary);
@@ -106,7 +107,7 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
       fileMetadata: undefined,
       fileMetadataOrder: undefined,
     },
-    checked: item.checked,
+    checked: !!item.checked,
     checkChar: item.checked ? item.checkChar || ' ' : ' ',
   };
 
@@ -125,7 +126,7 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
 
       if (
         genericNode.type === 'hashtag' &&
-        !(parent.children.first() as any)?.value?.startsWith('```')
+        !(parent!.children.first() as any)?.value?.startsWith('```')
       ) {
         if (!itemData.metadata.tags) {
           itemData.metadata.tags = [];
@@ -135,8 +136,8 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
 
         if (moveTags) {
           title = markRangeForDeletion(title, {
-            start: node.position.start.offset - itemBoundary.start,
-            end: node.position.end.offset - itemBoundary.start,
+            start: node.position!.start.offset! - itemBoundary.start,
+            end: node.position!.end.offset! - itemBoundary.start,
           });
         }
         return true;
@@ -147,8 +148,8 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
 
         if (moveDates) {
           title = markRangeForDeletion(title, {
-            start: node.position.start.offset - itemBoundary.start,
-            end: node.position.end.offset - itemBoundary.start,
+            start: node.position!.start.offset! - itemBoundary.start,
+            end: node.position!.end.offset! - itemBoundary.start,
           });
         }
         return true;
@@ -158,8 +159,8 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
         itemData.metadata.timeStr = (genericNode as TimeNode).time;
         if (moveDates) {
           title = markRangeForDeletion(title, {
-            start: node.position.start.offset - itemBoundary.start,
-            end: node.position.end.offset - itemBoundary.start,
+            start: node.position!.start.offset! - itemBoundary.start,
+            end: node.position!.end.offset! - itemBoundary.start,
           });
         }
         return true;
@@ -202,7 +203,7 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
       else if (firstLineEnd <= 0 || curr.end < firstLineEnd) acc.push(curr);
 
       return acc;
-    }, []));
+    }, [] as InlineField[]));
 
     const moveTaskData = stateManager.getSetting('move-task-metadata');
     const moveMetadata = stateManager.getSetting('inline-metadata-position') !== 'body';

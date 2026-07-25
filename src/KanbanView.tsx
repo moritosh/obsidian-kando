@@ -30,7 +30,7 @@ export const kanbanIcon = 'lucide-trello';
 
 export class KanbanView extends TextFileView implements HoverParent {
   plugin: KanbanPlugin;
-  hoverPopover: HoverPopover | null;
+  hoverPopover: HoverPopover | null = null;
   emitter: EventEmitter;
   actionButtons: Record<string, HTMLElement> = {};
 
@@ -41,7 +41,7 @@ export class KanbanView extends TextFileView implements HoverParent {
   viewSettings: KanbanViewSettings = {};
 
   get isPrimary(): boolean {
-    return this.plugin.getStateManager(this.file)?.getAView() === this;
+    return this.plugin.getStateManager(this.file!)?.getAView() === this;
   }
 
   get id(): string {
@@ -63,11 +63,11 @@ export class KanbanView extends TextFileView implements HoverParent {
     this.emitter.on('hotkey', ({ commandId }) => {
       switch (commandId) {
         case 'daily-notes:goto-prev': {
-          gotoPrevDailyNote(this.app, this.file);
+          gotoPrevDailyNote(this.app, this.file!);
           break;
         }
         case 'daily-notes:goto-next': {
-          gotoNextDailyNote(this.app, this.file);
+          gotoNextDailyNote(this.app, this.file!);
           break;
         }
       }
@@ -109,7 +109,7 @@ export class KanbanView extends TextFileView implements HoverParent {
 
     for (const k of this.previewCache.keys()) {
       if (!seenKeys.has(k)) {
-        this.removeChild(this.previewCache.get(k));
+        this.removeChild(this.previewCache.get(k)!);
         this.previewCache.delete(k);
       }
     }
@@ -117,18 +117,18 @@ export class KanbanView extends TextFileView implements HoverParent {
 
   setView(view: KanbanFormat) {
     this.setViewState(frontmatterKey, view);
-    this.app.fileManager.processFrontMatter(this.file, (frontmatter) => {
+    this.app.fileManager.processFrontMatter(this.file!, (frontmatter) => {
       frontmatter[frontmatterKey] = view;
     });
   }
 
   setBoard(board: Board, shouldSave: boolean = true) {
-    const stateManager = this.plugin.stateManagers.get(this.file);
+    const stateManager = this.plugin.stateManagers.get(this.file!)!;
     stateManager.setState(board, shouldSave);
   }
 
   getBoard(): Board {
-    const stateManager = this.plugin.stateManagers.get(this.file);
+    const stateManager = this.plugin.stateManagers.get(this.file!)!;
     return stateManager.state;
   }
 
@@ -159,7 +159,7 @@ export class KanbanView extends TextFileView implements HoverParent {
     try {
       return await super.onLoadFile(file);
     } catch (e) {
-      const stateManager = this.plugin.stateManagers.get(this.file);
+      const stateManager = this.plugin.stateManagers.get(this.file!);
       stateManager?.setError(e);
       throw e;
     }
@@ -196,7 +196,7 @@ export class KanbanView extends TextFileView implements HoverParent {
   }
 
   handleRename(newPath: string, oldPath: string) {
-    if (this.file.path === newPath) {
+    if (this.file!.path === newPath) {
       this.plugin.handleViewFileRename(this, oldPath);
     }
   }
@@ -220,7 +220,7 @@ export class KanbanView extends TextFileView implements HoverParent {
 
   setViewData(data: string, clear?: boolean) {
     if (!hasFrontmatterKeyRaw(data)) {
-      this.plugin.kanbanFileModes[(this.leaf as any).id || this.file.path] = 'markdown';
+      this.plugin.kanbanFileModes[(this.leaf as any).id || this.file!.path] = 'markdown';
       this.plugin.removeView(this);
       this.plugin.setMarkdownView(this.leaf, false);
 
@@ -256,7 +256,7 @@ export class KanbanView extends TextFileView implements HoverParent {
     globalUpdater?: (old: KanbanViewSettings[K]) => KanbanViewSettings[K]
   ) {
     if (globalUpdater) {
-      const stateManager = this.plugin.getStateManager(this.file);
+      const stateManager = this.plugin.getStateManager(this.file!)!;
       stateManager.viewSet.forEach((view) => {
         view.viewSettings[key] = globalUpdater(view.viewSettings[key]);
       });
@@ -273,24 +273,24 @@ export class KanbanView extends TextFileView implements HoverParent {
   }
 
   getViewState<K extends keyof KanbanViewSettings>(key: K) {
-    const stateManager = this.plugin.stateManagers.get(this.file);
+    const stateManager = this.plugin.stateManagers.get(this.file!)!;
     const settingVal = stateManager.getSetting(key);
     return this.viewSettings[key] ?? settingVal;
   }
 
   useViewState<K extends keyof KanbanViewSettings>(key: K) {
-    const stateManager = this.plugin.stateManagers.get(this.file);
+    const stateManager = this.plugin.stateManagers.get(this.file!)!;
     const settingVal = stateManager.useSetting(key);
     return this.viewSettings[key] ?? settingVal;
   }
 
   getPortal() {
-    const stateManager = this.plugin.stateManagers.get(this.file);
+    const stateManager = this.plugin.stateManagers.get(this.file!)!;
     return <Kanban stateManager={stateManager} view={this} />;
   }
 
   getBoardSettings() {
-    const stateManager = this.plugin.stateManagers.get(this.file);
+    const stateManager = this.plugin.stateManagers.get(this.file!)!;
     const board = stateManager.state;
 
     new SettingsModal(
@@ -326,7 +326,7 @@ export class KanbanView extends TextFileView implements HoverParent {
           .setIcon('lucide-file-text')
           .setSection('pane')
           .onClick(() => {
-            this.plugin.kanbanFileModes[(this.leaf as any).id || this.file.path] = 'markdown';
+            this.plugin.kanbanFileModes[(this.leaf as any).id || this.file!.path] = 'markdown';
             this.plugin.setMarkdownView(this.leaf);
           });
       })
@@ -345,7 +345,7 @@ export class KanbanView extends TextFileView implements HoverParent {
           .setIcon('lucide-archive')
           .setSection('pane')
           .onClick(() => {
-            const stateManager = this.plugin.stateManagers.get(this.file);
+            const stateManager = this.plugin.stateManagers.get(this.file!)!;
             stateManager.archiveCompletedCards();
           });
       });
@@ -359,7 +359,7 @@ export class KanbanView extends TextFileView implements HoverParent {
 
   _initHeaderButtons = async () => {
     if (Platform.isPhone) return;
-    const stateManager = this.plugin.getStateManager(this.file);
+    const stateManager = this.plugin.getStateManager(this.file!);
 
     if (!stateManager) return;
 
@@ -435,7 +435,7 @@ export class KanbanView extends TextFileView implements HoverParent {
         'lucide-file-text',
         t('Open as markdown'),
         () => {
-          this.plugin.kanbanFileModes[(this.leaf as any).id || this.file.path] = 'markdown';
+          this.plugin.kanbanFileModes[(this.leaf as any).id || this.file!.path] = 'markdown';
           this.plugin.setMarkdownView(this.leaf);
         }
       );
@@ -452,7 +452,7 @@ export class KanbanView extends TextFileView implements HoverParent {
         'lucide-archive',
         t('Archive completed cards'),
         () => {
-          const stateManager = this.plugin.stateManagers.get(this.file);
+          const stateManager = this.plugin.stateManagers.get(this.file!)!;
           stateManager.archiveCompletedCards();
         }
       );

@@ -47,7 +47,7 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
 
       if (dragEntity.scopeId === 'htmldnd') {
         const data = dragEntity.getData();
-        const stateManager = plugin.getStateManagerFromViewID(data.viewId, data.win);
+        const stateManager = plugin.getStateManagerFromViewID(data.viewId, data.win)!;
         const dropPath = dropEntity.getPath();
         const destinationParent = getEntityFromPath(stateManager.state, dropPath.slice(0, -1));
 
@@ -102,8 +102,8 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
 
       // Same board
       if (sourceFile === destinationFile) {
-        const view = plugin.getKanbanView(dragEntity.scopeId, dragEntityData.win);
-        const stateManager = plugin.stateManagers.get(view.file);
+        const view = plugin.getKanbanView(dragEntity.scopeId, dragEntityData.win)!;
+        const stateManager = plugin.stateManagers.get(view.file!)!;
 
         if (inDropArea) {
           dropPath.push(0);
@@ -147,13 +147,13 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
           );
 
           if (entity.type === DataTypes.Lane) {
-            const from = dragPath.last();
-            let to = dropPath.last();
+            const from = dragPath.last()!;
+            let to = dropPath.last()!;
 
             if (from < to) to -= 1;
 
             const collapsedState = view.getViewState('list-collapse');
-            const op = (collapsedState: boolean[]) => {
+            const op = (collapsedState: boolean[] = []) => {
               const newState = [...collapsedState];
               newState.splice(to, 0, newState.splice(from, 1)[0]);
               return newState;
@@ -182,14 +182,14 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
         });
       }
 
-      const sourceView = plugin.getKanbanView(dragEntity.scopeId, dragEntityData.win);
-      const sourceStateManager = plugin.stateManagers.get(sourceView.file);
-      const destinationView = plugin.getKanbanView(dropEntity.scopeId, dropEntityData.win);
-      const destinationStateManager = plugin.stateManagers.get(destinationView.file);
+      const sourceView = plugin.getKanbanView(dragEntity.scopeId, dragEntityData.win)!;
+      const sourceStateManager = plugin.stateManagers.get(sourceView.file!)!;
+      const destinationView = plugin.getKanbanView(dropEntity.scopeId, dropEntityData.win)!;
+      const destinationStateManager = plugin.stateManagers.get(destinationView.file!)!;
 
       sourceStateManager.setState((sourceBoard) => {
         const entity = getEntityFromPath(sourceBoard, dragPath);
-        let replacementEntity: Nestable;
+        let replacementEntity!: Nestable;
 
         destinationStateManager.setState((destinationBoard) => {
           if (inDropArea) {
@@ -214,7 +214,7 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
               dropPath,
               entity
             );
-            replacementEntity = replacement;
+            replacementEntity = replacement!;
             toInsert.push(next);
           } else {
             toInsert.push(entity);
@@ -222,10 +222,10 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
 
           if (entity.type === DataTypes.Lane) {
             const collapsedState = destinationView.getViewState('list-collapse');
-            const val = sourceView.getViewState('list-collapse')[dragPath.last()];
-            const op = (collapsedState: boolean[]) => {
+            const val = (sourceView.getViewState('list-collapse') ?? [])[dragPath.last()!];
+            const op = (collapsedState: boolean[] = []) => {
               const newState = [...collapsedState];
-              newState.splice(dropPath.last(), 0, val);
+              newState.splice(dropPath.last()!, 0, val);
               return newState;
             };
 
@@ -241,9 +241,9 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
 
         if (entity.type === DataTypes.Lane) {
           const collapsedState = sourceView.getViewState('list-collapse');
-          const op = (collapsedState: boolean[]) => {
+          const op = (collapsedState: boolean[] = []) => {
             const newState = [...collapsedState];
-            newState.splice(dragPath.last(), 1);
+            newState.splice(dragPath.last()!, 1);
             return newState;
           };
           sourceView.setViewState('list-collapse', undefined, op);
@@ -272,11 +272,11 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
 
               const overlayData = entity.getData();
 
-              const view = plugin.getKanbanView(entity.scopeId, overlayData.win);
-              const stateManager = plugin.stateManagers.get(view.file);
+              const view = plugin.getKanbanView(entity.scopeId, overlayData.win)!;
+              const stateManager = plugin.stateManagers.get(view.file!)!;
               const data = getEntityFromPath(stateManager.state, entity.getPath());
               const boardModifiers = getBoardModifiers(view, stateManager);
-              const filePath = view.file.path;
+              const filePath = view.file!.path;
 
               return [
                 data,
@@ -295,11 +295,12 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
                 context?.stateManager.getSetting(frontmatterKey);
               const collapseState =
                 context?.view.viewSettings['list-collapse'] ||
-                context?.stateManager.getSetting('list-collapse');
-              const laneIndex = entity.getPath().last();
+                context?.stateManager.getSetting('list-collapse') ||
+                [];
+              const laneIndex = entity.getPath().last()!;
 
               return (
-                <KanbanContext.Provider value={context}>
+                <KanbanContext.Provider value={context!}>
                   <div
                     className={classcat([
                       c('drag-container'),
@@ -324,7 +325,7 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
 
             if (data?.type === DataTypes.Item) {
               return (
-                <KanbanContext.Provider value={context}>
+                <KanbanContext.Provider value={context!}>
                   <div className={c('drag-container')} style={styles}>
                     <DraggableItem item={data as Item} itemIndex={0} isStatic={true} />
                   </div>

@@ -19,7 +19,7 @@ import { LaneLimitCounter, LaneTitle } from './LaneTitle';
 interface LaneHeaderProps {
   lane: Lane;
   laneIndex: number;
-  bindHandle: (el: HTMLElement) => void;
+  bindHandle: (el: HTMLElement | null) => void;
   setIsItemInputVisible?: Dispatch<StateUpdater<EditState>>;
   isCollapsed: boolean;
   toggleIsCollapsed: () => void;
@@ -43,7 +43,7 @@ function LaneButtons({
     <div className={c('lane-settings-button-wrapper')}>
       {isEditing(editState) ? (
         <a
-          onClick={() => setEditState(null)}
+          onClick={() => setEditState(EditingState.cancel)}
           aria-label={t('Close')}
           className={`${c('lane-settings-button')} is-enabled clickable-icon`}
         >
@@ -57,7 +57,7 @@ function LaneButtons({
               className={`${c('lane-settings-button')} clickable-icon`}
               onClick={() => setIsItemInputVisible({ x: 0, y: 0 })}
               onDragOver={(e) => {
-                if (getDropAction(stateManager, e.dataTransfer)) {
+                if (getDropAction(stateManager, e.dataTransfer!)) {
                   setIsItemInputVisible({ x: 0, y: 0 });
                 }
               }}
@@ -100,7 +100,7 @@ export const LaneHeader = memo(function LaneHeader({
 
   useEffect(() => {
     if (lane.data.forceEditMode) {
-      setEditState(null);
+      setEditState(EditingState.cancel);
     }
   }, [lane.data.forceEditMode]);
 

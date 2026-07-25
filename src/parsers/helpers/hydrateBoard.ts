@@ -1,10 +1,11 @@
-import { moment } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 import { StateManager } from 'src/StateManager';
 import { c, escapeRegExpStr, getDateColorFn } from 'src/components/helpers';
 import { Board, DataTypes, DateColor, Item, Lane } from 'src/components/types';
 import { Path } from 'src/dnd/types';
 import { getEntityFromPath } from 'src/dnd/util/data';
 import { Op } from 'src/helpers/patch';
+import { defaultDateTrigger, defaultTimeTrigger } from 'src/settingHelpers';
 
 import { getSearchValue } from '../common';
 
@@ -13,17 +14,17 @@ export function hydrateLane(stateManager: StateManager, lane: Lane) {
 }
 
 export function preprocessTitle(stateManager: StateManager, title: string) {
-  const getDateColor = getDateColorFn(stateManager.getSetting('date-colors'));
-  const dateTrigger = stateManager.getSetting('date-trigger');
-  const dateFormat = stateManager.getSetting('date-format');
-  const dateDisplayFormat = stateManager.getSetting('date-display-format');
-  const timeTrigger = stateManager.getSetting('time-trigger');
-  const timeFormat = stateManager.getSetting('time-format');
+  const getDateColor = getDateColorFn(stateManager.getSetting('date-colors') ?? []);
+  const dateTrigger = stateManager.getSetting('date-trigger') ?? defaultDateTrigger;
+  const dateFormat = stateManager.getSetting('date-format') ?? '';
+  const dateDisplayFormat = stateManager.getSetting('date-display-format') ?? dateFormat;
+  const timeTrigger = stateManager.getSetting('time-trigger') ?? defaultTimeTrigger;
+  const timeFormat = stateManager.getSetting('time-format') ?? '';
 
   const { app } = stateManager;
 
   let date: moment.Moment;
-  let dateColor: DateColor;
+  let dateColor: DateColor | null = null;
   const getWrapperStyles = (baseClass: string) => {
     let wrapperStyle = '';
     if (dateColor) {
@@ -156,9 +157,9 @@ function opAffectsHydration(op: Op) {
     (op.op === 'add' || op.op === 'replace') &&
     ['title', 'titleRaw', 'dateStr', 'timeStr', /\d$/, /\/fileAccessor\/.+$/].some((postFix) => {
       if (typeof postFix === 'string') {
-        return op.path.last().toString().endsWith(postFix);
+        return op.path.last()!.toString().endsWith(postFix);
       } else {
-        return postFix.test(op.path.last().toString());
+        return postFix.test(op.path.last()!.toString());
       }
     })
   );

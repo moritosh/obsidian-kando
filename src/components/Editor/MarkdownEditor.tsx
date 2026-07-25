@@ -15,7 +15,7 @@ import { datePlugins, stateManagerField } from './dateWidget';
 import { matchDateTrigger, matchTimeTrigger } from './suggest';
 
 interface MarkdownEditorProps {
-  editorRef?: MutableRefObject<EditorView>;
+  editorRef?: MutableRefObject<EditorView | null>;
   editState?: EditState;
   onEnter: (cm: EditorView, mod: boolean, shift: boolean) => boolean;
   onEscape: (cm: EditorView) => void;
@@ -76,7 +76,7 @@ function getMarkdownController(
       return view.file;
     },
     get path() {
-      return view.file.path;
+      return view.file!.path;
     },
   };
 }
@@ -108,8 +108,8 @@ export function MarkdownEditor({
   placeholder,
 }: MarkdownEditorProps) {
   const { view, stateManager } = useContext(KanbanContext);
-  const elRef = useRef<HTMLDivElement>();
-  const internalRef = useRef<EditorView>();
+  const elRef = useRef<HTMLDivElement>(null);
+  const internalRef = useRef<EditorView | null>(null);
 
   useEffect(() => {
     class Editor extends view.plugin.MarkdownEditor {
@@ -120,8 +120,8 @@ export function MarkdownEditor({
         editor: ObsidianEditor,
         lineHasGlobalFilter: boolean
       ) {
-        if (matchTimeTrigger(stateManager.getSetting('time-trigger'), editor, cursor)) return false;
-        if (matchDateTrigger(stateManager.getSetting('date-trigger'), editor, cursor)) return false;
+        if (matchTimeTrigger(stateManager.getSetting('time-trigger')!, editor, cursor)) return false;
+        if (matchDateTrigger(stateManager.getSetting('date-trigger')!, editor, cursor)) return false;
         if (lineHasGlobalFilter && cursor.line === 0) return true;
         return undefined;
       }
@@ -227,7 +227,7 @@ export function MarkdownEditor({
 
     controller.editMode = editor;
     editor.set(value || '');
-    if (isEditing(editState)) {
+    if (editState && isEditing(editState)) {
       cm.dispatch({
         userEvent: 'select.pointer',
         selection: EditorSelection.single(cm.posAtCoords(editState, false)),
@@ -239,7 +239,7 @@ export function MarkdownEditor({
     }
 
     const onShow = () => {
-      elRef.current.scrollIntoView({ block: 'end' });
+      elRef.current!.scrollIntoView({ block: 'end' });
     };
 
     if (Platform.isMobile) {
@@ -274,7 +274,7 @@ export function MarkdownEditor({
       <div className={classcat(cls)} ref={elRef}></div>
       {Platform.isMobile && (
         <button
-          onClick={() => onSubmit(internalRef.current)}
+          onClick={() => onSubmit(internalRef.current!)}
           className={classcat([c('item-submit-button'), 'mod-cta'])}
         >
           {t('Submit')}

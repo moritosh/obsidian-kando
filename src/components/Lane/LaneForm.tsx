@@ -16,7 +16,7 @@ interface LaneFormProps {
 
 export function LaneForm({ onNewLane, closeLaneForm }: LaneFormProps) {
   const [shouldMarkAsComplete, setShouldMarkAsComplete] = useState(false);
-  const editorRef = useRef<EditorView>();
+  const editorRef = useRef<EditorView | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>();
   const clickOutsideRef = useOnclickOutside(() => closeLaneForm(), {
     ignoreClass: [c('ignore-click-outside'), 'mobile-toolbar', 'suggestion-container'],
@@ -61,6 +61,7 @@ export function LaneForm({ onNewLane, closeLaneForm }: LaneFormProps) {
         createLane(cm, cm.state.doc.toString());
         return true;
       }
+      return false;
     },
     [createLane]
   );

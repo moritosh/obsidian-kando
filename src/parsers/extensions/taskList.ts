@@ -1,8 +1,8 @@
 import { factorySpace } from 'micromark-factory-space';
 import { markdownLineEndingOrSpace, markdownSpace } from 'micromark-util-character';
-import { codes } from 'micromark-util-symbol/codes.js';
-import { types } from 'micromark-util-symbol/types.js';
-import { Effects, Extension, State, Token } from 'micromark-util-types';
+import { codes, types } from 'micromark-util-symbol';
+import { Code, Effects, Extension, State, Token, TokenizeContext } from 'micromark-util-types';
+import { CompileContext } from 'mdast-util-from-markdown';
 
 const tasklistCheck = { tokenize: tokenizeTasklistCheck };
 
@@ -10,12 +10,12 @@ export const gfmTaskListItem: Extension = {
   text: { [codes.leftSquareBracket]: tasklistCheck },
 };
 
-function tokenizeTasklistCheck(effects: Effects, ok: State, nok: State) {
+function tokenizeTasklistCheck(this: TokenizeContext, effects: Effects, ok: State, nok: State) {
   const self = this;
 
   return open;
 
-  function open(code: number) {
+  function open(code: Code): State | undefined {
     if (
       // Exit if there’s stuff before.
       self.previous !== codes.eof ||
@@ -33,8 +33,7 @@ function tokenizeTasklistCheck(effects: Effects, ok: State, nok: State) {
     return inside;
   }
 
-  /** @type {State} */
-  function inside(code: number) {
+  function inside(code: Code): State | undefined {
     if (markdownSpace(code)) {
       effects.enter('taskListCheckValueUnchecked' as any);
       effects.consume(code);
@@ -52,8 +51,7 @@ function tokenizeTasklistCheck(effects: Effects, ok: State, nok: State) {
     return nok(code);
   }
 
-  /** @type {State} */
-  function close(code: number) {
+  function close(code: Code): State | undefined {
     if (code === codes.rightSquareBracket) {
       effects.enter('taskListCheckMarker' as any);
       effects.consume(code);
@@ -66,14 +64,13 @@ function tokenizeTasklistCheck(effects: Effects, ok: State, nok: State) {
   }
 }
 
-/** @type {Tokenizer} */
-function spaceThenNonSpace(effects: Effects, ok: State, nok: State) {
+function spaceThenNonSpace(this: TokenizeContext, effects: Effects, ok: State, nok: State) {
   const self = this;
 
   return factorySpace(effects, after, types.whitespace);
 
   /** @type {State} */
-  function after(code: number) {
+  function after(code: Code) {
     const tail = self.events[self.events.length - 1];
 
     return tail &&
@@ -94,18 +91,16 @@ export const gfmTaskListItemFromMarkdown = {
   },
 };
 
-/** @type {FromMarkdownHandle} */
-function exitCheck(token: Token) {
-  const node = /** @type {ListItem} */ this.stack[this.stack.length - 2];
+function exitCheck(this: CompileContext, token: Token) {
+  const node = this.stack[this.stack.length - 2] as any;
   // We’re always in a paragraph, in a list item.
   node.checked = token.type === ('taskListCheckValueChecked' as any);
   node.checkChar = this.sliceSerialize(token);
 }
 
-/** @type {FromMarkdownHandle} */
-function exitParagraphWithTaskListItem(token: Token) {
-  const parent = /** @type {Parent} */ this.stack[this.stack.length - 2];
-  const node = /** @type {Paragraph} */ this.stack[this.stack.length - 1];
+function exitParagraphWithTaskListItem(this: CompileContext, token: Token) {
+  const parent = this.stack[this.stack.length - 2] as any;
+  const node = this.stack[this.stack.length - 1] as any;
   const siblings = parent.children;
   const head = node.children[0];
   let index = -1;

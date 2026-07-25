@@ -1,5 +1,6 @@
 import classcat from 'classcat';
-import { getLinkpath, moment } from 'obsidian';
+import { getLinkpath } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 import { JSX, useMemo } from 'preact/compat';
 import { StateManager } from 'src/StateManager';
 import { t } from 'src/lang/helpers';
@@ -7,7 +8,7 @@ import { t } from 'src/lang/helpers';
 import { c } from '../helpers';
 import { DateColor, Item } from '../types';
 
-export function getRelativeDate(date: moment.Moment, time: moment.Moment) {
+export function getRelativeDate(date: moment.Moment, time?: moment.Moment) {
   if (time) {
     return time.from(moment());
   }
@@ -51,8 +52,8 @@ export function RelativeDate({ item, stateManager }: DateProps) {
 interface DateAndTimeProps {
   onEditDate?: JSX.MouseEventHandler<HTMLSpanElement>;
   onEditTime?: JSX.MouseEventHandler<HTMLSpanElement>;
-  filePath: string;
-  getDateColor: (date: moment.Moment) => DateColor;
+  filePath?: string;
+  getDateColor: (date: moment.Moment) => DateColor | null;
 }
 
 export function DateAndTime({
@@ -88,7 +89,7 @@ export function DateAndTime({
 
   const datePath = dateStr ? getLinkpath(dateStr) : null;
   const isResolved = dateStr
-    ? stateManager.app.metadataCache.getFirstLinkpathDest(datePath, filePath)
+    ? stateManager.app.metadataCache.getFirstLinkpathDest(datePath!, filePath!)
     : null;
   const date =
     datePath && shouldLinkDate ? (
@@ -115,10 +116,12 @@ export function DateAndTime({
   return (
     <span
       style={
-        dateColor && {
-          '--date-color': dateColor.color,
-          '--date-background-color': dateColor.backgroundColor,
-        }
+        dateColor
+          ? {
+              '--date-color': dateColor.color,
+              '--date-background-color': dateColor.backgroundColor,
+            }
+          : undefined
       }
       className={classcat([
         c('item-metadata-date-wrapper'),

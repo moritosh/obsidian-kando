@@ -393,7 +393,7 @@ function extractSpecialTaskFields(line: string): InlineField[] {
     let value = match[1];
     let end = match.index + match[0].length;
 
-    if (key === 'priority') value = iconToPriority(value);
+    if (key === 'priority') value = iconToPriority(value) ?? value;
     else if (key === 'repeat') {
       const originalLen = value.length;
       value = RRule.fromText(value).toText();

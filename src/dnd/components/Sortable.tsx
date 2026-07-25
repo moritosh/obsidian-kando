@@ -48,8 +48,8 @@ export function useIsSorting() {
   const [isSorting, setIsSorting] = useState(false);
 
   useEffect(() => {
-    sortManager.addSortNotifier(setIsSorting);
-    return () => sortManager.removeSortNotifier(setIsSorting);
+    sortManager?.addSortNotifier(setIsSorting);
+    return () => sortManager?.removeSortNotifier(setIsSorting);
   }, [sortManager]);
 
   return isSorting;

@@ -1,5 +1,7 @@
 import update from 'immutability-helper';
-import { App, TFile, moment } from 'obsidian';
+import { App, TFile } from 'obsidian';
+
+import { moment } from 'src/helpers/moment';
 import { useEffect, useState } from 'preact/compat';
 
 import { KanbanView } from './KanbanView';
@@ -22,7 +24,9 @@ export class StateManager {
   compiledSettings: KanbanSettings = {};
 
   app: App;
-  state: Board;
+  // Assigned synchronously by getParsedBoard/setState during the initial
+  // registerView call kicked off at the end of the constructor.
+  state!: Board;
   file: TFile;
 
   parser: BaseFormat;
@@ -35,7 +39,7 @@ export class StateManager {
     getGlobalSettings: () => KanbanSettings
   ) {
     this.app = app;
-    this.file = initialView.file;
+    this.file = initialView.file!;
     this.onEmpty = onEmpty;
     this.getGlobalSettings = getGlobalSettings;
     this.parser = new ListFormat(this);
@@ -44,7 +48,7 @@ export class StateManager {
   }
 
   getAView(): KanbanView {
-    return this.viewSet.values().next().value;
+    return this.viewSet.values().next().value!;
   }
 
   hasError(): boolean {
@@ -201,13 +205,13 @@ export class StateManager {
       const receiver = () => setState(this.getSetting(key));
 
       if (this.settingsNotifiers.has(key)) {
-        this.settingsNotifiers.get(key).push(receiver);
+        this.settingsNotifiers.get(key)!.push(receiver);
       } else {
         this.settingsNotifiers.set(key, [receiver]);
       }
 
       return () => {
-        this.settingsNotifiers.get(key).remove(receiver);
+        this.settingsNotifiers.get(key)?.remove(receiver);
       };
     }, []);
 
@@ -298,7 +302,7 @@ export class StateManager {
       return globalSettings[key];
     }
 
-    return null;
+    return undefined;
   };
 
   getParsedBoard(data: string) {
@@ -324,10 +328,12 @@ export class StateManager {
     } catch (e) {
       console.error(e);
 
+      const error = e instanceof Error ? e : new Error(String(e));
+
       board = update(board, {
         data: {
           errors: {
-            $push: [{ description: e.toString(), stack: e.stack }],
+            $push: [{ description: error.toString(), stack: error.stack ?? '' }],
           },
         },
       });
@@ -336,12 +342,13 @@ export class StateManager {
     return board;
   }
 
-  setError(e: Error) {
+  setError(e: unknown) {
+    const error = e instanceof Error ? e : new Error(String(e));
     this.setState(
       update(this.state, {
         data: {
           errors: {
-            $push: [{ description: e.toString(), stack: e.stack }],
+            $push: [{ description: error.toString(), stack: error.stack ?? '' }],
           },
         },
       }),

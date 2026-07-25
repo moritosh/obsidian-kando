@@ -55,7 +55,7 @@ export class ListFormat implements BaseFormat {
         state,
         newBoard,
         (path) => {
-          return generatedKeys.includes(path.last());
+          return generatedKeys.includes(path.last()!);
         },
         (val: any) => {
           if (!val) return String(val);

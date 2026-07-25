@@ -84,7 +84,7 @@ export const Droppable = memo(function Droppable({
   useOnMount(
     [elementRef, measureRef],
     () => {
-      managerRef.current?.initNodes(elementRef.current, measureRef.current);
+      managerRef.current?.initNodes(elementRef.current!, measureRef.current!);
     },
     () => {
       managerRef.current?.destroy();

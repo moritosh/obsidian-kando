@@ -17,8 +17,8 @@ interface Child {
 export class EntityManager {
   children: Map<string, Child>;
   dndManager: DndManager;
-  entityNode: HTMLElement;
-  measureNode: HTMLElement;
+  entityNode!: HTMLElement;
+  measureNode!: HTMLElement;
   getEntityData: () => EntityData;
   index: number;
   parent: EntityManager | null;
@@ -54,7 +54,7 @@ export class EntityManager {
     this.children = new Map();
     this.parent = parent;
     this.scrollParent = scrollParent;
-    this.getEntityData = () => data.current;
+    this.getEntityData = () => data.current!;
     this.sortManager = sortManager;
   }
 

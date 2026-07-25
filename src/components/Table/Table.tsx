@@ -26,12 +26,12 @@ function useIntersectionObserver() {
   useEffect(() => {
     return () => {
       observerRef.current?.disconnect();
-      handlers.current = null;
+      handlers.current = new WeakMap();
       queueRef.current.length = 0;
     };
   }, []);
 
-  const bindObserver = (el: HTMLElement) => {
+  const bindObserver = (el: HTMLElement | null) => {
     if (!el) return;
     if (targetRef.current === el) return;
     if (observerRef.current) observerRef.current.disconnect();
@@ -43,7 +43,7 @@ function useIntersectionObserver() {
         entries.forEach((entry) => {
           if (!handlers.current.has(entry.target as HTMLElement)) return;
           const handler = handlers.current.get(entry.target as HTMLElement);
-          handler(entry);
+          handler!(entry);
         });
       },
       {
@@ -54,7 +54,7 @@ function useIntersectionObserver() {
     );
 
     targetRef.current = el;
-    queueRef.current.forEach((el) => observerRef.current.observe(el));
+    queueRef.current.forEach((el) => observerRef.current!.observe(el));
     queueRef.current.length = 0;
   };
 

@@ -18,16 +18,16 @@ export function useStoredScrollState(id: string, index: number | undefined) {
   const scrollRef = Preact.useRef<HTMLDivElement>(null);
   const scrollStateManager = Preact.useContext(ScrollStateContext);
 
-  const setRef = (el: HTMLDivElement) => {
+  const setRef = (el: HTMLDivElement | null) => {
     scrollRef.current = el;
 
-    if (scrollRef.current) {
+    if (el) {
       el.win.requestAnimationFrame(() => {
         const state = scrollStateManager.getScrollState(id);
 
         if (state && (state.x !== 0 || state.y !== 0)) {
-          scrollRef.current.scrollLeft = state.x;
-          scrollRef.current.scrollTop = state.y;
+          scrollRef.current!.scrollLeft = state.x;
+          scrollRef.current!.scrollTop = state.y;
         }
       });
     }

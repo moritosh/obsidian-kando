@@ -60,14 +60,14 @@ export function DragOverlay({ children }: DragOverlayProps) {
       }
       dragOriginHitbox = dragEntity.getHitbox();
       setDragEntity(dragEntity);
-      setStyles(getDragOverlayStyles(dragPosition, dragOrigin, dragOriginHitbox, dragEntityMargin));
+      setStyles(getDragOverlayStyles(dragPosition, dragOrigin, dragOriginHitbox, dragEntityMargin ?? emptyHitbox));
     };
 
     const dragMove = ({ dragOrigin, dragPosition, dragEntityMargin }: DragEventData) => {
       if (!dragPosition || !dragOrigin) {
         return;
       }
-      setStyles(getDragOverlayStyles(dragPosition, dragOrigin, dragOriginHitbox, dragEntityMargin));
+      setStyles(getDragOverlayStyles(dragPosition, dragOrigin, dragOriginHitbox, dragEntityMargin ?? emptyHitbox));
     };
 
     const dragEnd = ({
@@ -95,7 +95,7 @@ export function DragOverlay({ children }: DragOverlayProps) {
             dragPosition,
             dragOrigin,
             dragOriginHitbox,
-            dragEntityMargin,
+            dragEntityMargin ?? emptyHitbox,
             transition,
             transform
           )
@@ -150,7 +150,7 @@ export function useIsAnythingDragging() {
       activeWindow.setTimeout(() => setIsDragging(false), dropDuration);
     };
 
-    const { emitter } = dndManager.dragManager;
+    const { emitter } = dndManager!.dragManager;
 
     emitter.on('dragStart', onDragStart);
     emitter.on('dragEnd', onDragEnd);

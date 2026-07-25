@@ -13,7 +13,7 @@ export class ScrollStateManager {
     this.scrollStates.set(id, state);
 
     if (this.idScopes.has(id)) {
-      const scopes = this.idScopes.get(id);
+      const scopes = this.idScopes.get(id)!;
 
       if (!scopes.has(scopeId)) {
         scopes.add(scopeId);
@@ -25,7 +25,7 @@ export class ScrollStateManager {
 
   getScrollState(id: string): CoordinateShift {
     if (this.scrollStates.has(id)) {
-      return this.scrollStates.get(id);
+      return this.scrollStates.get(id)!;
     }
 
     return initialScrollState;

@@ -2251,7 +2251,7 @@ function FlatpickrInstance(element: HTMLElement, instanceConfig?: Options): Inst
     self.selectedDates = (
       self.config.allowInvalidPreload
         ? dates
-        : dates.filter((d) => (d as Date).getDate && isEnabled(d, false))
+        : dates.filter((d) => (d as Date).getDate && isEnabled(d!, false))
     ) as Date[];
 
     if (self.config.mode === 'range') self.selectedDates.sort((a, b) => a.getTime() - b.getTime());

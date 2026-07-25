@@ -13,7 +13,7 @@ export interface KanbanContextProps {
   view: KanbanView;
 }
 
-export const KanbanContext = createContext<KanbanContextProps>(null);
+export const KanbanContext = createContext<KanbanContextProps>(null!);
 
 export interface SearchContextProps {
   query: string;

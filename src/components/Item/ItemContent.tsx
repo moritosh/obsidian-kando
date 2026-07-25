@@ -38,7 +38,7 @@ export function useDatePickers(item: Item, explicitPath?: Path) {
   return useMemo(() => {
     const onEditDate = (e: MouseEvent) => {
       constructDatePicker(
-        e.view,
+        e.view!,
         stateManager,
         { x: e.clientX, y: e.clientY },
         constructMenuDatePickerOnChange({
@@ -54,7 +54,7 @@ export function useDatePickers(item: Item, explicitPath?: Path) {
 
     const onEditTime = (e: MouseEvent) => {
       constructTimePicker(
-        e.view, // Preact uses real events, so this is safe
+        e.view!, // Preact uses real events, so this is safe
         stateManager,
         { x: e.clientX, y: e.clientY },
         constructMenuTimePickerOnChange({
@@ -137,7 +137,7 @@ export function Tags({
   const search = useContext(SearchContext);
   const shouldShow = stateManager.useSetting('move-tags') || alwaysShow;
 
-  if (!tags.length || !shouldShow) return null;
+  if (!tags?.length || !shouldShow) return null;
 
   return (
     <div className={c('item-tags')}>
@@ -165,10 +165,12 @@ export function Tags({
               searchQuery && tag.toLocaleLowerCase().contains(searchQuery) ? 'is-search-match' : ''
             }`}
             style={
-              tagColor && {
-                '--tag-color': tagColor.color,
-                '--tag-background': tagColor.backgroundColor,
-              }
+              tagColor
+                ? {
+                    '--tag-color': tagColor.color,
+                    '--tag-background': tagColor.backgroundColor,
+                  }
+                : undefined
             }
           >
             <span>{tag[0]}</span>
@@ -211,16 +213,17 @@ export const ItemContent = memo(function ItemContent({
         setEditState(EditingState.complete);
         return true;
       }
+      return false;
     },
     [stateManager]
   );
 
   const onWrapperClick = useCallback(
     (e: MouseEvent) => {
-      if (e.targetNode.instanceOf(HTMLElement)) {
-        if (e.targetNode.hasClass(c('item-metadata-date'))) {
+      if (e.targetNode!.instanceOf(HTMLElement)) {
+        if (e.targetNode!.hasClass(c('item-metadata-date'))) {
           onEditDate(e);
-        } else if (e.targetNode.hasClass(c('item-metadata-time'))) {
+        } else if (e.targetNode!.hasClass(c('item-metadata-time'))) {
           onEditTime(e);
         }
       }
@@ -244,7 +247,7 @@ export const ItemContent = memo(function ItemContent({
           return;
         }
 
-        const checkboxIndex = parseInt(target.dataset.checkboxIndex, 10);
+        const checkboxIndex = parseInt(target.dataset.checkboxIndex!, 10);
         const checked = checkCheckbox(stateManager, item.data.titleRaw, checkboxIndex);
         const updated = stateManager.updateItemContent(item, checked);
 

@@ -59,7 +59,7 @@ export function buildInsertMutation(
 ) {
   return buildUpdateParentMutation(destination, {
     children: {
-      $splice: [[destination.last() + destinationModifier, 0, ...entities]],
+      $splice: [[destination.last()! + destinationModifier, 0, ...entities]],
     },
   });
 }
@@ -85,7 +85,7 @@ export function moveEntity(
   source: Path,
   destination: Path,
   transform?: (entity: Nestable) => Nestable | Nestable[],
-  replace?: (entity: Nestable) => Nestable
+  replace?: (entity: Nestable) => Nestable | undefined
 ) {
   const entity = transform
     ? transform(getEntityFromPath(root, source))

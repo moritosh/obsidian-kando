@@ -156,7 +156,7 @@ export interface SettingsManagerConfig {
 }
 
 export class SettingsManager {
-  win: Window;
+  win: Window | null = null;
   app: App;
   plugin: KanbanPlugin;
   config: SettingsManagerConfig;
@@ -172,9 +172,9 @@ export class SettingsManager {
   }
 
   applySettingsUpdate(spec: Spec<KanbanSettings>) {
-    this.win.clearTimeout(this.applyDebounceTimer);
+    this.win!.clearTimeout(this.applyDebounceTimer);
 
-    this.applyDebounceTimer = this.win.setTimeout(() => {
+    this.applyDebounceTimer = this.win!.setTimeout(() => {
       this.settings = update(this.settings, spec);
       this.config.onSettingsChange(this.settings);
     }, 1000);
@@ -1180,11 +1180,11 @@ export class SettingsManager {
           dropdown.setValue(
             value?.toString() || globalValue?.toString() || defaultMetadataPosition
           );
-          dropdown.onChange((value: 'body' | 'footer' | 'metadata-table') => {
+          dropdown.onChange((value: string) => {
             if (value) {
               this.applySettingsUpdate({
                 'inline-metadata-position': {
-                  $set: value,
+                  $set: value as 'body' | 'footer' | 'metadata-table',
                 },
               });
             } else {
@@ -1555,7 +1555,7 @@ export class SettingsModal extends Modal {
 
     modalEl.addClass(c('board-settings-modal'));
 
-    this.settingsManager.constructUI(contentEl, this.view.file.basename, true);
+    this.settingsManager.constructUI(contentEl, this.view.file!.basename, true);
   }
 
   onClose() {

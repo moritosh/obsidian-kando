@@ -1,6 +1,6 @@
 import classcat from 'classcat';
 import update from 'immutability-helper';
-import { moment } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 import Preact from 'preact/compat';
 
 import { Icon } from '../components/Icon/Icon';

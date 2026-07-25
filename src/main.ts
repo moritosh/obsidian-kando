@@ -24,7 +24,7 @@ import { basicFrontmatter, frontmatterKey } from './parsers/common';
 interface WindowRegistry {
   viewMap: Map<string, KanbanView>;
   viewStateReceivers: Array<(views: KanbanView[]) => void>;
-  appRoot: HTMLElement;
+  appRoot: HTMLElement | null;
 }
 
 function getEditorClass(app: any) {
@@ -46,7 +46,8 @@ function getEditorClass(app: any) {
 }
 
 export default class KanbanPlugin extends Plugin {
-  settingsTab: KanbanSettingsTab;
+  // Assigned during onload(), per Obsidian's plugin lifecycle contract.
+  settingsTab!: KanbanSettingsTab;
   settings: KanbanSettings = {};
 
   // leafid => view mode
@@ -190,7 +191,7 @@ export default class KanbanPlugin extends Plugin {
       return null;
     }
 
-    return this.stateManagers.get(view.file);
+    return this.stateManagers.get(view.file!);
   }
 
   useKanbanViews(win: Window): KanbanView[] {
@@ -218,10 +219,10 @@ export default class KanbanPlugin extends Plugin {
       reg.viewMap.set(view.id, view);
     }
 
-    const file = view.file;
+    const file = view.file!;
 
     if (this.stateManagers.has(file)) {
-      this.stateManagers.get(file).registerView(view, data, shouldParseData);
+      this.stateManagers.get(file)!.registerView(view, data, shouldParseData);
     } else {
       this.stateManagers.set(
         file,
@@ -246,14 +247,14 @@ export default class KanbanPlugin extends Plugin {
     if (!entry) return;
 
     const [win, reg] = entry;
-    const file = view.file;
+    const file = view.file!;
 
     if (reg.viewMap.has(view.id)) {
       reg.viewMap.delete(view.id);
     }
 
     if (this.stateManagers.has(file)) {
-      this.stateManagers.get(file).unregisterView(view);
+      this.stateManagers.get(file)!.unregisterView(view);
       reg.viewStateReceivers.forEach((fn) => fn(this.getKanbanViews(win)));
     }
   }
@@ -264,7 +265,7 @@ export default class KanbanPlugin extends Plugin {
       return;
     }
 
-    const reg = this.windowRegistry.get(win);
+    const reg = this.windowRegistry.get(win)!;
     const oldId = `${(view.leaf as any).id}:::${oldPath}`;
 
     if (reg.viewMap.has(oldId)) {
@@ -276,7 +277,7 @@ export default class KanbanPlugin extends Plugin {
     }
 
     if (view.isPrimary) {
-      this.getStateManager(view.file).softRefresh();
+      this.getStateManager(view.file!)!.softRefresh();
     }
   }
 
@@ -301,15 +302,15 @@ export default class KanbanPlugin extends Plugin {
       return;
     }
 
-    const reg = this.windowRegistry.get(win);
+    const reg = this.windowRegistry.get(win)!;
 
     for (const view of reg.viewMap.values()) {
       this.removeView(view);
     }
 
-    unmountComponentAtNode(reg.appRoot);
+    unmountComponentAtNode(reg.appRoot!);
 
-    reg.appRoot.remove();
+    reg.appRoot!.remove();
     reg.viewMap.clear();
     reg.viewStateReceivers.length = 0;
     reg.appRoot = null;
@@ -446,7 +447,7 @@ export default class KanbanPlugin extends Plugin {
           }
 
           if (Platform.isMobile) {
-            const stateManager = this.stateManagers.get(file);
+            const stateManager = this.stateManagers.get(file)!;
             const kanbanView = leaf.view as KanbanView;
             const boardView =
               kanbanView.viewSettings[frontmatterKey] || stateManager.getSetting(frontmatterKey);
@@ -476,7 +477,7 @@ export default class KanbanPlugin extends Plugin {
                   .setIcon('lucide-archive')
                   .setSection('pane')
                   .onClick(() => {
-                    const stateManager = this.stateManagers.get(file);
+                    const stateManager = this.stateManagers.get(file)!;
                     stateManager.archiveCompletedCards();
                   });
               })
@@ -588,7 +589,7 @@ export default class KanbanPlugin extends Plugin {
         if (!activeView) return false;
         if (checking) return true;
 
-        this.stateManagers.get(activeView.file).archiveCompletedCards();
+        this.stateManagers.get(activeView.file!)!.archiveCompletedCards();
       },
     });
 
@@ -631,12 +632,12 @@ export default class KanbanPlugin extends Plugin {
 
         if (!activeView) return false;
 
-        const isFileEmpty = activeView.file.stat.size === 0;
+        const isFileEmpty = activeView.file!.stat.size === 0;
 
         if (checking) return isFileEmpty;
         if (isFileEmpty) {
           app.vault
-            .modify(activeView.file, basicFrontmatter)
+            .modify(activeView.file!, basicFrontmatter)
             .then(() => {
               this.setKanbanView(activeView.leaf);
             })
@@ -652,7 +653,7 @@ export default class KanbanPlugin extends Plugin {
         const view = app.workspace.getActiveViewOfType(KanbanView);
 
         if (checking) {
-          return view && view instanceof KanbanView;
+          return !!(view && view instanceof KanbanView);
         }
 
         if (view && view instanceof KanbanView) {
@@ -668,7 +669,7 @@ export default class KanbanPlugin extends Plugin {
         const view = app.workspace.getActiveViewOfType(KanbanView);
 
         if (checking) {
-          return view && view instanceof KanbanView;
+          return !!(view && view instanceof KanbanView);
         }
 
         if (view && view instanceof KanbanView) {
@@ -684,7 +685,7 @@ export default class KanbanPlugin extends Plugin {
         const view = app.workspace.getActiveViewOfType(KanbanView);
 
         if (checking) {
-          return view && view instanceof KanbanView;
+          return !!(view && view instanceof KanbanView);
         }
 
         if (view && view instanceof KanbanView) {
@@ -700,7 +701,7 @@ export default class KanbanPlugin extends Plugin {
         const view = app.workspace.getActiveViewOfType(KanbanView);
 
         if (checking) {
-          return view && view instanceof KanbanView;
+          return !!(view && view instanceof KanbanView);
         }
 
         if (view && view instanceof KanbanView) {
@@ -730,7 +731,7 @@ export default class KanbanPlugin extends Plugin {
       this.register(
         around((app as any).commands, {
           executeCommand(next) {
-            return function (command: any) {
+            return function (this: any, command: any) {
               const view = app.workspace.getActiveViewOfType(KanbanView);
 
               if (view && command?.id) {
@@ -749,8 +750,8 @@ export default class KanbanPlugin extends Plugin {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         setActiveLeaf(next) {
-          return function (...args) {
-            next.apply(this, args);
+          return function (this: any, ...args: any[]) {
+            next.apply(this, args as any);
             const view = this.getActiveViewOfType(KanbanView);
             if (view?.activeEditor) {
               this.activeEditor = view.activeEditor;
@@ -766,7 +767,7 @@ export default class KanbanPlugin extends Plugin {
         // Kanbans can be viewed as markdown or kanban, and we keep track of the mode
         // while the file is open. When the file closes, we no longer need to keep track of it.
         detach(next) {
-          return function () {
+          return function (this: any) {
             const state = this.view?.getState();
 
             if (state?.file && self.kanbanFileModes[this.id || state.file]) {
@@ -778,7 +779,7 @@ export default class KanbanPlugin extends Plugin {
         },
 
         setViewState(next) {
-          return function (state: ViewState, ...rest: any[]) {
+          return function (this: any, state: ViewState, ...rest: any[]) {
             if (
               // Don't force kanban mode during shutdown
               self._loaded &&
@@ -800,11 +801,11 @@ export default class KanbanPlugin extends Plugin {
 
                 self.kanbanFileModes[state.state.file as string] = kanbanViewType;
 
-                return next.apply(this, [newState, ...rest]);
+                return next.apply(this, [newState, ...rest] as any);
               }
             }
 
-            return next.apply(this, [state, ...rest]);
+            return next.apply(this, [state, ...rest] as any);
           };
         },
       })

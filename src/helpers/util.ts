@@ -9,8 +9,9 @@ export const defaultSort = compare;
 export class PromiseCapability<T = void> {
   promise: Promise<T>;
 
-  resolve: (data: T) => void;
-  reject: (reason?: any) => void;
+  // Assigned synchronously inside the Promise executor below.
+  resolve!: (data: T) => void;
+  reject!: (reason?: any) => void;
 
   settled = false;
 

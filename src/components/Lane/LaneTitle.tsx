@@ -23,7 +23,7 @@ export function LaneLimitCounter({
   itemCount,
   editState,
 }: {
-  maxItems: number;
+  maxItems?: number;
   itemCount: number;
   editState: EditState;
 }) {
@@ -42,7 +42,7 @@ export function LaneLimitCounter({
       ])}
     >
       {itemCount}
-      {maxItems > 0 && (
+      {!!maxItems && maxItems > 0 && (
         <>
           <span className={c('lane-title-count-separator')}>/</span>
           <span className={c('lane-title-count-limit')}>{maxItems}</span>
@@ -76,6 +76,7 @@ export function LaneTitle({ maxItems, editState, setEditState, title, onChange }
         setEditState(EditingState.complete);
         return true;
       }
+      return false;
     },
     [setEditState, stateManager]
   );

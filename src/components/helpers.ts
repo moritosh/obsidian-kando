@@ -1,5 +1,6 @@
 import update from 'immutability-helper';
-import { App, MarkdownView, TFile, moment } from 'obsidian';
+import { App, MarkdownView, TFile } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 import Preact, { Dispatch, RefObject, useEffect } from 'preact/compat';
 import { StateUpdater, useMemo } from 'preact/hooks';
 import { StateManager } from 'src/StateManager';
@@ -20,8 +21,8 @@ export const baseClassName = 'kanban-plugin';
 export function noop() {}
 
 const classCache = new Map<string, string>();
-export function c(className: string) {
-  if (classCache.has(className)) return classCache.get(className);
+export function c(className: string): string {
+  if (classCache.has(className)) return classCache.get(className)!;
   const cls = `${baseClassName}__${className}`;
   classCache.set(className, cls);
   return cls;
@@ -64,8 +65,8 @@ export function maybeCompleteForMove(
 
   if (updates) {
     const [itemStrings, checkChars, thisIndex] = updates;
-    let next: Item;
-    let replacement: Item;
+    let next!: Item;
+    let replacement: Item | undefined;
 
     itemStrings.forEach((str, i) => {
       if (i === thisIndex) {
@@ -124,9 +125,9 @@ export async function applyTemplate(stateManager: StateManager, templatePath?: s
     try {
       // Force the view to source mode, if needed
       if (activeView?.getMode() !== 'source') {
-        await activeView.setState(
+        await activeView!.setState(
           {
-            ...activeView.getState(),
+            ...activeView!.getState(),
             mode: 'source',
           },
           { history: false }
@@ -157,7 +158,7 @@ export async function applyTemplate(stateManager: StateManager, templatePath?: s
 
       // No template plugins enabled so we can just append the template to the doc
       await stateManager.app.vault.modify(
-        stateManager.app.workspace.getActiveFile(),
+        stateManager.app.workspace.getActiveFile()!,
         templateContent
       );
     } catch (e) {
@@ -206,7 +207,7 @@ export function getTemplatePlugins(app: App) {
   const templaterEnabled = (app as any).plugins.enabledPlugins.has('templater-obsidian');
   const templaterEmptyFileTemplate =
     templaterPlugin &&
-    (this.app as any).plugins.plugins['templater-obsidian'].settings?.empty_file_template;
+    (app as any).plugins.plugins['templater-obsidian'].settings?.empty_file_template;
 
   const templateFolder = templatesEnabled
     ? templatesPlugin.instance.options.folder
@@ -237,8 +238,8 @@ export function getTagColorFn(tagColors: TagColor[]) {
   };
 }
 
-export function useGetTagColorFn(stateManager: StateManager): (tag: string) => TagColor {
-  const tagColors = stateManager.useSetting('tag-colors');
+export function useGetTagColorFn(stateManager: StateManager): (tag: string) => TagColor | null {
+  const tagColors = stateManager.useSetting('tag-colors') ?? [];
   return useMemo(() => getTagColorFn(tagColors), [tagColors]);
 }
 
@@ -260,7 +261,7 @@ export function getDateColorFn(dateColors: DateColor[]) {
       const modifier = c.direction === 'after' ? 1 : -1;
       const date = moment();
 
-      date.add(c.distance * modifier, c.unit);
+      date.add(c.distance! * modifier, c.unit);
 
       return [date, c];
     }
@@ -315,7 +316,7 @@ export function getDateColorFn(dateColors: DateColor[]) {
 export function useGetDateColorFn(
   stateManager: StateManager
 ): (date: moment.Moment) => DateColor | null {
-  const dateColors = stateManager.useSetting('date-colors');
+  const dateColors = stateManager.useSetting('date-colors') ?? [];
   return useMemo(() => getDateColorFn(dateColors), [dateColors]);
 }
 
@@ -336,7 +337,11 @@ export function parseMetadataWithOptions(data: InlineField, metadataKeys: DataKe
       };
 }
 
-export function useOnMount(refs: RefObject<HTMLElement>[], cb: () => void, onUnmount?: () => void) {
+export function useOnMount(
+  refs: RefObject<HTMLElement | null>[],
+  cb: () => void,
+  onUnmount?: () => void
+) {
   useEffect(() => {
     let complete = 0;
     let unmounted = false;
@@ -349,7 +354,7 @@ export function useOnMount(refs: RefObject<HTMLElement>[], cb: () => void, onUnm
     for (const ref of refs) ref.current?.onNodeInserted(onDone, true);
     return () => {
       unmounted = true;
-      onUnmount();
+      onUnmount?.();
     };
   }, []);
 }

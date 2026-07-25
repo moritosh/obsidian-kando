@@ -56,9 +56,9 @@ const ItemInner = memo(function ItemInner({
       if (isEditing(editState)) setEditState(EditingState.cancel);
     };
 
-    dndManager.dragManager.emitter.on('dragStart', handler);
+    dndManager!.dragManager.emitter.on('dragStart', handler);
     return () => {
-      dndManager.dragManager.emitter.off('dragStart', handler);
+      dndManager!.dragManager.emitter.off('dragStart', handler);
     };
   }, [dndManager, editState]);
 
@@ -82,8 +82,8 @@ const ItemInner = memo(function ItemInner({
     (e) => {
       if (isEditing(editState)) return;
       if (
-        e.targetNode.instanceOf(HTMLAnchorElement) &&
-        (e.targetNode.hasClass('internal-link') || e.targetNode.hasClass('external-link'))
+        e.targetNode!.instanceOf(HTMLAnchorElement) &&
+        (e.targetNode!.hasClass('internal-link') || e.targetNode!.hasClass('external-link'))
       ) {
         return;
       }
@@ -120,7 +120,7 @@ const ItemInner = memo(function ItemInner({
           boardModifiers={boardModifiers}
           item={item}
           path={path}
-          shouldMarkItemsComplete={shouldMarkItemsComplete}
+          shouldMarkItemsComplete={!!shouldMarkItemsComplete}
           stateManager={stateManager}
         />
         <ItemContent
@@ -128,7 +128,7 @@ const ItemInner = memo(function ItemInner({
           searchQuery={isMatch ? searchQuery : undefined}
           setEditState={setEditState}
           editState={editState}
-          isStatic={isStatic}
+          isStatic={!!isStatic}
         />
         <ItemMenuButton editState={editState} setEditState={setEditState} showMenu={showItemMenu} />
       </div>

@@ -102,7 +102,7 @@ export class DragManager {
 
   dragStartHTML(e: DragEvent, viewId: string) {
     this.isHTMLDragging = true;
-    const entity = createHTMLDndEntity(e.pageX, e.pageY, [], viewId, e.view);
+    const entity = createHTMLDndEntity(e.pageX, e.pageY, [], viewId, e.view!);
 
     this.dragEntityId = entity.entityId;
     this.dragOrigin = { x: e.pageX, y: e.pageY };
@@ -142,7 +142,7 @@ export class DragManager {
   dragEndHTML(e: DragEvent, viewId: string, content: string[], isLeave?: boolean) {
     this.isHTMLDragging = false;
     if (!isLeave) {
-      this.dragEntity = createHTMLDndEntity(e.pageX, e.pageY, content, viewId, e.view);
+      this.dragEntity = createHTMLDndEntity(e.pageX, e.pageY, content, viewId, e.view!);
       this.emitter.emit('dragEnd', this.getDragEventData());
     }
 
@@ -334,7 +334,7 @@ export class DragManager {
   }
 }
 
-const cancelEvent = (e: TouchEvent) => {
+const cancelEvent = (e: Event) => {
   e.preventDefault();
   e.stopPropagation();
 };
@@ -346,7 +346,7 @@ export function useDragHandle(
   const dndManager = useContext(DndManagerContext);
   const unbind = useRef(() => {});
 
-  return useCallback((el: HTMLElement) => {
+  return useCallback((el: HTMLElement | null) => {
     if (handleElement.current !== el) {
       unbind.current();
       unbind.current = () => {};
@@ -372,7 +372,7 @@ export function useDragHandle(
         return;
       }
 
-      const win = e.view;
+      const win = e.view!;
       const isTouchEvent = ['pen', 'touch'].includes(e.pointerType);
       const pointerId = e.pointerId;
 
@@ -476,7 +476,7 @@ export function useDragHandle(
 }
 
 export function createHTMLDndHandlers(stateManager: StateManager) {
-  const dndManager = useContext(DndManagerContext);
+  const dndManager = useContext(DndManagerContext)!;
   const onDragOver = useCallback(
     (e: DragEvent) => {
       if (dndManager.dragManager.isHTMLDragging) {

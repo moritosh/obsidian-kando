@@ -1,5 +1,6 @@
 import { FileWithPath, fromEvent } from 'file-selector';
-import { Platform, TFile, TFolder, htmlToMarkdown, moment, parseLinktext, setIcon } from 'obsidian';
+import { Platform, TFile, TFolder, htmlToMarkdown, parseLinktext, setIcon } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 import { StateManager } from 'src/StateManager';
 import { Path } from 'src/dnd/types';
 import { buildLinkToDailyNote } from 'src/helpers';
@@ -45,7 +46,7 @@ export function constructDatePicker(
           };
 
           const selfDestruct = () => {
-            picker.destroy();
+            picker!.destroy();
             div.remove();
             win.document.body.removeEventListener('click', clickHandler);
             win.document.removeEventListener('keydown', keyHandler);
@@ -189,8 +190,8 @@ export function constructTimePicker(
     div.style.left = `${coordinates.x || 0}px`;
     div.style.top = `${coordinates.y || 0}px`;
 
-    let selectedItem: HTMLDivElement = null;
-    let middleItem: HTMLDivElement = null;
+    let selectedItem: HTMLDivElement | null = null;
+    let middleItem: HTMLDivElement | null = null;
 
     options.forEach((opt, index) => {
       const isSelected = opt === selected;
@@ -295,7 +296,7 @@ export function getItemClassModifiers(item: Item) {
     classModifiers.push('is-complete');
   }
 
-  for (const tag of item.data.metadata.tags) {
+  for (const tag of item.data.metadata.tags ?? []) {
     classModifiers.push(`has-tag-${tag.slice(1)}`);
   }
 
@@ -403,7 +404,7 @@ export function getFileListFromClipboard(win: Window & typeof globalThis) {
 }
 
 function getFileFromPath(file: string) {
-  return file.split('\\').pop().split('/').pop();
+  return file.split('\\').pop()!.split('/').pop()!;
 }
 
 async function linkFromBuffer(
@@ -459,7 +460,7 @@ async function handleElectronPaste(stateManager: StateManager, win: Window & typ
           return linkTo(stateManager, newFile, stateManager.file.path);
         } else {
           const splitFile = file.originalName.split('.');
-          const ext = splitFile.pop();
+          const ext = splitFile.pop()!;
           const fileName = splitFile.join('.');
 
           return await linkFromBuffer(stateManager, fileName, ext, file.buffer);
@@ -504,7 +505,7 @@ function handleFiles(stateManager: StateManager, files: FileWithPath[], isPaste?
             )) as string;
             const newFile = await stateManager.app.vault.createBinary(
               path,
-              e.target.result as ArrayBuffer
+              e.target!.result as ArrayBuffer
             );
 
             resolve(linkTo(stateManager, newFile, stateManager.file.path));
@@ -548,12 +549,12 @@ async function handleNullDraggable(
     }
 
     const files: File[] = [];
-    const items = (e as ClipboardEvent).clipboardData.items;
+    const items = (e as ClipboardEvent).clipboardData!.items;
 
     for (const index in items) {
       const item = items[index];
       if (item.kind === 'file') {
-        files.push(item.getAsFile());
+        files.push(item.getAsFile()!);
       }
     }
 
@@ -562,9 +563,9 @@ async function handleNullDraggable(
     }
   }
 
-  const html = transfer.getData('text/html');
-  const plain = transfer.getData('text/plain');
-  const uris = transfer.getData('text/uri-list');
+  const html = transfer!.getData('text/html');
+  const plain = transfer!.getData('text/plain');
+  const uris = transfer!.getData('text/uri-list');
 
   const text = forcePlaintext ? plain || html : getMarkdown(html);
 
@@ -601,7 +602,7 @@ export async function handleDragOrPaste(
       let link = draggable.file
         ? linkTo(stateManager, draggable.file, parseLinktext(draggable.linktext).subpath)
         : `[[${draggable.linktext}]]`;
-      const alias = new DOMParser().parseFromString(transfer.getData('text/html'), 'text/html')
+      const alias = new DOMParser().parseFromString(transfer!.getData('text/html'), 'text/html')
         .documentElement.textContent; // Get raw text
       link = link.replace(/]]$/, `|${alias}]]`).replace(/^\[[^\]].+]\(/, `[${alias}](`);
       return [link];

@@ -1,15 +1,15 @@
-import { Token } from 'mdast-util-from-markdown';
+import { CompileContext, Token } from 'mdast-util-from-markdown';
 
 export function internalMarkdownLinks(
   process: (node: Record<string, any>, isEmbed: boolean) => void
 ) {
-  function exitLink(token: Token) {
-    process(this.stack[this.stack.length - 1], false);
+  function exitLink(this: CompileContext, token: Token) {
+    process(this.stack[this.stack.length - 1] as any, false);
     this.exit(token);
   }
 
-  function exitImage(token: Token) {
-    process(this.stack[this.stack.length - 1], true);
+  function exitImage(this: CompileContext, token: Token) {
+    process(this.stack[this.stack.length - 1] as any, true);
     this.exit(token);
   }
 

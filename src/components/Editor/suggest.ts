@@ -6,8 +6,8 @@ import {
   EditorSuggestContext,
   EditorSuggestTriggerInfo,
   TFile,
-  moment,
 } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 
 import KanbanPlugin from '../../main';
 import { buildTimeArray } from '../Item/helpers';
@@ -30,6 +30,7 @@ export function matchDateTrigger(dateTrigger: string, editor: Editor, cursor: Ed
 export class DateSuggest extends EditorSuggest<[]> {
   plugin: KanbanPlugin;
   app: App;
+  declare suggestEl: HTMLElement;
 
   get stateManager() {
     return this.context ? this.plugin.stateManagers.get(this.context.file) : null;
@@ -50,7 +51,7 @@ export class DateSuggest extends EditorSuggest<[]> {
       if (!datepicker) return;
 
       const currentDate = moment(datepicker.selectedDates[0] || new Date());
-      let nextDate: Date;
+      let nextDate!: Date;
 
       if (dir === 'right') {
         if (currentDate.weekday() === 6) {
@@ -82,13 +83,13 @@ export class DateSuggest extends EditorSuggest<[]> {
     this.scope.register([], 'ArrowUp', () => move('up'));
 
     this.scope.register([], 'Enter', () => {
-      const selectedDates = this.datepicker.selectedDates;
+      const selectedDates = this.datepicker!.selectedDates;
       const ctx = this.context;
 
       if (selectedDates.length) {
-        applyDate(ctx, this.stateManager, selectedDates[0]);
+        applyDate(ctx!, this.stateManager!, selectedDates[0]);
       } else {
-        applyDate(ctx, this.stateManager, new Date());
+        applyDate(ctx!, this.stateManager!, new Date());
       }
 
       this.close();
@@ -105,17 +106,16 @@ export class DateSuggest extends EditorSuggest<[]> {
     return [];
   }
 
-  suggestEl: HTMLElement;
   renderSuggestion(): void {}
   selectSuggestion(): void {}
 
-  datepicker: Instance = null;
+  datepicker: Instance | null = null;
   showSuggestions() {
     const { datepicker, suggestEl, context, stateManager } = this;
     if (!datepicker && stateManager) {
       suggestEl.empty();
       suggestEl.addClasses([c('date-picker'), c('ignore-click-outside')]);
-      constructDatePicker(context, stateManager, suggestEl, (picker) => {
+      constructDatePicker(context!, stateManager, suggestEl, (picker) => {
         this.datepicker = picker;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -128,7 +128,7 @@ export class DateSuggest extends EditorSuggest<[]> {
     const stateManager = this.plugin.getStateManager(file);
     if (!stateManager) return null;
 
-    const dateTrigger = stateManager.getSetting('date-trigger');
+    const dateTrigger = stateManager.getSetting('date-trigger')!;
     const match = matchDateTrigger(dateTrigger, editor, cursor);
     if (!match) return null;
 
@@ -152,7 +152,7 @@ export class DateSuggest extends EditorSuggest<[]> {
 
 export class TimeSuggest extends EditorSuggest<string> {
   plugin: KanbanPlugin;
-  times: string[];
+  times: string[] | null = null;
 
   constructor(app: App, plugin: KanbanPlugin) {
     super(app);
@@ -160,11 +160,15 @@ export class TimeSuggest extends EditorSuggest<string> {
     this.plugin = plugin;
   }
 
-  onTrigger(cursor: EditorPosition, editor: Editor, file: TFile): EditorSuggestTriggerInfo {
+  onTrigger(
+    cursor: EditorPosition,
+    editor: Editor,
+    file: TFile
+  ): EditorSuggestTriggerInfo | null {
     const stateManager = this.plugin.getStateManager(file);
     if (!stateManager) return null;
 
-    const timeTrigger = stateManager.getSetting('time-trigger');
+    const timeTrigger = stateManager.getSetting('time-trigger')!;
     const match = matchTimeTrigger(timeTrigger, editor, cursor);
     if (!match) return null;
 
@@ -184,7 +188,7 @@ export class TimeSuggest extends EditorSuggest<string> {
     const stateManager = this.plugin.getStateManager(context.file);
     if (!stateManager) return [];
 
-    return this.times.filter((t) => {
+    return this.times!.filter((t) => {
       return t.startsWith(context.query) || t.startsWith('0' + context.query);
     });
   }
@@ -199,18 +203,18 @@ export class TimeSuggest extends EditorSuggest<string> {
 
   selectSuggestion(value: string): void {
     const { context, plugin } = this;
-    const stateManager = plugin.getStateManager(context.file);
+    const stateManager = plugin.getStateManager(context!.file);
     if (!stateManager) return;
 
     const timeTrigger = stateManager.getSetting('time-trigger');
     const replacement = `${timeTrigger}{${value}} `;
 
-    context.editor.replaceRange(replacement, context.start, context.end);
-    context.editor.setCursor({
-      line: context.start.line,
-      ch: context.start.ch + replacement.length,
+    context!.editor.replaceRange(replacement, context!.start, context!.end);
+    context!.editor.setCursor({
+      line: context!.start.line,
+      ch: context!.start.ch + replacement.length,
     });
-    context.editor.focus();
+    context!.editor.focus();
   }
 
   close(): void {

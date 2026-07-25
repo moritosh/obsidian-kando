@@ -274,7 +274,7 @@ function Overlay({ keys, portalContainer }: OverlayProps) {
   );
 }
 
-function RespondToScroll({ scrollEl }: { scrollEl: HTMLElement }): JSX.Element {
+function RespondToScroll({ scrollEl }: { scrollEl: HTMLElement }): JSX.Element | null {
   const dndManager = useContext(DndManagerContext);
 
   useEffect(() => {
@@ -283,7 +283,7 @@ function RespondToScroll({ scrollEl }: { scrollEl: HTMLElement }): JSX.Element {
     const onScroll = () => {
       scrollEl.win.clearTimeout(debounce);
       debounce = scrollEl.win.setTimeout(() => {
-        dndManager.hitboxEntities.forEach((entity) => {
+        dndManager!.hitboxEntities.forEach((entity) => {
           entity.recalcInitial();
         });
       }, 100);

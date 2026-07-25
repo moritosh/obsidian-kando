@@ -33,16 +33,16 @@ export class ScrollManager {
   scopeId: string;
   triggerTypes: string[];
   scrollState: ScrollState;
-  scrollEl: HTMLElement;
+  scrollEl!: HTMLElement;
   parent: ScrollManager | null;
 
-  observer: IntersectionObserver;
+  observer!: IntersectionObserver;
   observerHandlers: Map<string, IntersectionObserverHandler>;
 
-  top: Entity;
-  right: Entity;
-  bottom: Entity;
-  left: Entity;
+  top!: Entity;
+  right!: Entity;
+  bottom!: Entity;
+  left!: Entity;
 
   scrollFrame: number = 0;
   activeScroll: Map<Side, number>;

@@ -13,7 +13,7 @@ import { useItemMenu } from '../Item/ItemMenu';
 import { MarkdownRenderer } from '../MarkdownRenderer/MarkdownRenderer';
 import { KanbanContext, SearchContext } from '../context';
 import { c, useGetDateColorFn } from '../helpers';
-import { EditState, Item, Lane, isEditing } from '../types';
+import { EditState, EditingState, Item, Lane, isEditing } from '../types';
 import { TableItem } from './types';
 
 export const DateCell = memo(function DateCell({
@@ -52,7 +52,7 @@ export const ItemCell = memo(
   function ItemCell({ item, lane, path }: { item: Item; lane: Lane; path: number[] }) {
     const { stateManager, boardModifiers } = useContext(KanbanContext);
     const search = useContext(SearchContext);
-    const [editState, setEditState] = useState<EditState>(null);
+    const [editState, setEditState] = useState<EditState>(EditingState.cancel);
     const shouldMarkItemsComplete = !!lane.data.shouldMarkItemsComplete;
 
     const showItemMenu = useItemMenu({
@@ -67,8 +67,8 @@ export const ItemCell = memo(
       (e) => {
         if (isEditing(editState)) return;
         if (
-          e.targetNode.instanceOf(HTMLAnchorElement) &&
-          (e.targetNode.hasClass('internal-link') || e.targetNode.hasClass('external-link'))
+          e.targetNode!.instanceOf(HTMLAnchorElement) &&
+          (e.targetNode!.hasClass('internal-link') || e.targetNode!.hasClass('external-link'))
         ) {
           return;
         }

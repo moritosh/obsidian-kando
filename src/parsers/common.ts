@@ -1,4 +1,5 @@
-import { App, TFile, moment } from 'obsidian';
+import { App, TFile, TagCache } from 'obsidian';
+import { moment } from 'src/helpers/moment';
 import { KanbanSettings } from 'src/Settings';
 import { StateManager } from 'src/StateManager';
 import { anyToString } from 'src/components/Item/MetadataTable';
@@ -103,7 +104,7 @@ export function getLinkedPageMetadata(
   stateManager: StateManager,
   linkedFile: TFile | null | undefined
 ): { fileMetadata?: FileMetadata; fileMetadataOrder?: string[] } {
-  const metaKeys = stateManager.getSetting('metadata-keys');
+  const metaKeys = stateManager.getSetting('metadata-keys') ?? [];
 
   if (!metaKeys.length) {
     return {};
@@ -136,10 +137,10 @@ export function getLinkedPageMetadata(
       let tags = cache?.tags || [];
 
       if (Array.isArray(cache?.frontmatter?.tags)) {
-        tags = [].concat(
-          tags,
-          cache.frontmatter.tags.map((tag: string) => ({ tag: `#${tag}` }))
-        );
+        tags = [
+          ...tags,
+          ...cache.frontmatter.tags.map((tag: string) => ({ tag: `#${tag}` }) as TagCache),
+        ];
       }
 
       if (tags?.length === 0) return;
@@ -176,7 +177,7 @@ export function getLinkedPageMetadata(
         if (/^\d{4}-\d{2}-\d{2}/.test(cacheVal)) {
           cacheVal = moment(cacheVal);
         } else if (/^\[\[[^\]]+\]\]$/.test(cacheVal)) {
-          const link = (cache.frontmatterLinks || []).find((l) => l.key === k.metadataKey);
+          const link = (cache?.frontmatterLinks || []).find((l) => l.key === k.metadataKey);
           if (link) {
             const file = stateManager.app.metadataCache.getFirstLinkpathDest(
               link.link,
@@ -190,7 +191,7 @@ export function getLinkedPageMetadata(
       } else if (Array.isArray(cacheVal)) {
         cacheVal = cacheVal.map<any>((v, i) => {
           if (typeof v === 'string' && /^\[\[[^\]]+\]\]$/.test(v)) {
-            const link = (cache.frontmatterLinks || []).find(
+            const link = (cache?.frontmatterLinks || []).find(
               (l) => l.key === k.metadataKey + '.' + i.toString()
             );
             if (link) {

@@ -14,9 +14,9 @@ export function DndScope({ id, children }: ScopeProps) {
 
   Preact.useEffect(() => {
     return () => {
-      scrollStateManager.unmountScope(id);
+      scrollStateManager.unmountScope(scopeId);
     };
-  }, [id]);
+  }, [scopeId]);
 
   return <ScopeIdContext.Provider value={scopeId}>{children}</ScopeIdContext.Provider>;
 }

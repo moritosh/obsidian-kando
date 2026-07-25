@@ -1,7 +1,19 @@
 type HTMLAttributes<T extends EventTarget> = import('preact/compat').HTMLAttributes<T> &
   AriaAttributes;
 
+// is-plain-object@5's package.json "exports" map omits a "types" condition, so
+// TS can't resolve its shipped is-plain-object.d.ts under "bundler" resolution.
+declare module 'is-plain-object' {
+  export function isPlainObject(o: any): boolean;
+}
+
 declare const app: import('obsidian').App;
+
+// Obsidian's desktop renderer runs with Node/Electron integration enabled,
+// exposing these as real globals (and via `win.require`/`win.process` on any
+// window reference) even though they aren't part of the `dom` lib.
+declare function require(id: string): any;
+declare const process: { platform: string; [key: string]: any };
 
 declare const Fragment: import('preact').FunctionComponent<Record<string, never>>;
 

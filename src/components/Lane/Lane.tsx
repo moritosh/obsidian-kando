@@ -70,7 +70,7 @@ function DraggableLaneRaw({
 
   const toggleIsCollapsed = useCallback(() => {
     stateManager.setState((board) => {
-      const collapseState = [...view.getViewState('list-collapse')];
+      const collapseState = [...(view.getViewState('list-collapse') ?? [])];
       collapseState[laneIndex] = !collapseState[laneIndex];
       view.setViewState('list-collapse', collapseState);
       return update(board, {
@@ -102,7 +102,7 @@ function DraggableLaneRaw({
       view.getWindow().setTimeout(() => {
         const laneItems = elementRef.current?.getElementsByClassName(c('lane-items'));
 
-        if (laneItems.length) {
+        if (laneItems?.length) {
           animateScrollTo([0, shouldPrepend ? 0 : laneItems[0].scrollHeight], {
             elementToScroll: laneItems[0],
             speed: 200,

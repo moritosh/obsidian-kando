@@ -1,6 +1,6 @@
-import { Extension as FromMarkdownExtension, Token } from 'mdast-util-from-markdown';
+import { CompileContext, Extension as FromMarkdownExtension, Token } from 'mdast-util-from-markdown';
 import { markdownLineEndingOrSpace } from 'micromark-util-character';
-import { Effects, Extension, State } from 'micromark-util-types';
+import { Code, Effects, Extension, State, TokenizeContext } from 'micromark-util-types';
 
 import { getSelf } from './helpers';
 
@@ -8,14 +8,14 @@ export function tagExtension(): Extension {
   const name = 'hashtag';
   const hashCharCode = '#'.charCodeAt(0);
 
-  function tokenize(effects: Effects, ok: State, nok: State) {
+  function tokenize(this: TokenizeContext, effects: Effects, ok: State, nok: State) {
     let data = false;
     let startMarkerCursor = 0;
     const self = this;
 
     return start;
 
-    function start(code: number) {
+    function start(code: Code): State | undefined {
       if (
         code !== hashCharCode ||
         (self.previous !== null && !/\s/.test(String.fromCharCode(self.previous)))
@@ -29,7 +29,7 @@ export function tagExtension(): Extension {
       return consumeStart(code);
     }
 
-    function consumeStart(code: number) {
+    function consumeStart(code: Code): State | undefined {
       if (startMarkerCursor === 1) {
         effects.exit(`${name}Marker` as any);
         return consumeData(code);
@@ -45,13 +45,13 @@ export function tagExtension(): Extension {
       return consumeStart;
     }
 
-    function consumeData(code: number) {
+    function consumeData(code: Code): State | undefined {
       effects.enter(`${name}Data` as any);
       effects.enter(`${name}Target` as any);
       return consumeTarget(code);
     }
 
-    function consumeTarget(code: number) {
+    function consumeTarget(code: Code): State | undefined {
       if (
         code === null ||
         markdownLineEndingOrSpace(code) ||
@@ -84,24 +84,24 @@ export function tagExtension(): Extension {
 export function tagFromMarkdown(): FromMarkdownExtension {
   const name = 'hashtag';
 
-  function enterTag(token: Token) {
+  function enterTag(this: CompileContext, token: Token) {
     this.enter(
       {
         type: name,
         value: null,
-      },
+      } as any,
       token
     );
   }
 
-  function exitTagTarget(token: Token) {
+  function exitTagTarget(this: CompileContext, token: Token) {
     const target = this.sliceSerialize(token);
     const current = getSelf(this.stack);
 
     (current as any).value = target;
   }
 
-  function exitTag(token: Token) {
+  function exitTag(this: CompileContext, token: Token) {
     this.exit(token);
   }
 

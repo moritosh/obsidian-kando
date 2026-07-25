@@ -1,6 +1,6 @@
-import { Extension as FromMarkdownExtension, Token } from 'mdast-util-from-markdown';
+import { CompileContext, Extension as FromMarkdownExtension, Token } from 'mdast-util-from-markdown';
 import { markdownLineEnding, markdownLineEndingOrSpace } from 'micromark-util-character';
-import { Effects, Extension, State } from 'micromark-util-types';
+import { Code, Effects, Extension, State, TokenizeContext } from 'micromark-util-types';
 
 import { getSelf } from './helpers';
 
@@ -9,14 +9,14 @@ export function genericWrappedExtension(
   startMarker: string,
   endMarker: string
 ): Extension {
-  function tokenize(effects: Effects, ok: State, nok: State) {
+  function tokenize(this: TokenizeContext, effects: Effects, ok: State, nok: State) {
     let data = false;
     let startMarkerCursor = 0;
     let endMarkerCursor = 0;
 
     return start;
 
-    function start(code: number) {
+    function start(code: Code): State | undefined {
       if (code !== startMarker.charCodeAt(startMarkerCursor)) return nok(code);
 
       effects.enter(name as any);
@@ -25,7 +25,7 @@ export function genericWrappedExtension(
       return consumeStart(code);
     }
 
-    function consumeStart(code: number) {
+    function consumeStart(code: Code): State | undefined {
       if (startMarkerCursor === startMarker.length) {
         effects.exit(`${name}Marker` as any);
         return consumeData(code);
@@ -41,7 +41,7 @@ export function genericWrappedExtension(
       return consumeStart;
     }
 
-    function consumeData(code: number) {
+    function consumeData(code: Code): State | undefined {
       if (markdownLineEnding(code) || code === null) {
         return nok(code);
       }
@@ -51,7 +51,7 @@ export function genericWrappedExtension(
       return consumeTarget(code);
     }
 
-    function consumeTarget(code: number) {
+    function consumeTarget(code: Code): State | undefined {
       if (code === endMarker.charCodeAt(endMarkerCursor)) {
         if (!data) return nok(code);
         effects.exit(`${name}Target` as any);
@@ -73,7 +73,7 @@ export function genericWrappedExtension(
       return consumeTarget;
     }
 
-    function consumeEnd(code: number) {
+    function consumeEnd(code: Code): State | undefined {
       if (endMarkerCursor === endMarker.length) {
         effects.exit(`${name}Marker` as any);
         effects.exit(name as any);
@@ -102,28 +102,28 @@ export function genericWrappedFromMarkdown(
   name: string,
   process?: (str: string, curr: Record<string, any>) => void
 ): FromMarkdownExtension {
-  function enterWrapped(token: Token) {
+  function enterWrapped(this: CompileContext, token: Token) {
     this.enter(
       {
         type: name,
         value: null,
-      },
+      } as any,
       token
     );
   }
 
-  function exitWrappedTarget(token: Token) {
+  function exitWrappedTarget(this: CompileContext, token: Token) {
     const target = this.sliceSerialize(token);
     const current = getSelf(this.stack);
 
     (current as any).value = target;
 
     if (process) {
-      process(target, current);
+      process(target, current as any);
     }
   }
 
-  function exitWrapped(token: Token) {
+  function exitWrapped(this: CompileContext, token: Token) {
     this.exit(token);
   }
 

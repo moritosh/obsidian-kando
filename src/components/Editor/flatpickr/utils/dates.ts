@@ -103,12 +103,12 @@ export const createDateParser =
     }
 
     /* istanbul ignore next */
-    if (!((parsedDate as Date).getDate && !isNaN(parsedDate.getTime()))) {
+    if (!((parsedDate as Date)?.getDate && !isNaN((parsedDate as Date).getTime()))) {
       config.errorHandler(new Error(`Invalid date provided: ${dateOrig}`));
       return undefined;
     }
 
-    if (timeless === true) parsedDate.setHours(0, 0, 0, 0);
+    if (timeless === true) parsedDate!.setHours(0, 0, 0, 0);
 
     return parsedDate;
   };
