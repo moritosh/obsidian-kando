@@ -1,6 +1,6 @@
 import update from 'immutability-helper';
 import { JSX, createPortal, memo, useCallback, useMemo } from 'preact/compat';
-import { maybeCelebrate } from 'src/helpers/celebrate';
+import { isDoneLane, maybeCelebrate } from 'src/helpers/celebrate';
 import { classcat } from 'src/helpers/util';
 
 import { KanbanView } from './KanbanView';
@@ -118,7 +118,7 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
             dropPath,
             (entity) => {
               if (entity.type === DataTypes.Item) {
-                const { next, becameComplete } = maybeCompleteForMove(
+                const { next } = maybeCompleteForMove(
                   stateManager,
                   board,
                   dragPath,
@@ -127,9 +127,21 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
                   dropPath,
                   entity
                 );
-                if (becameComplete && stateManager.getSetting('celebrate-completions')) {
+
+                const movedToNewLane = dragPath[0] !== dropPath[0];
+                const destinationLane = getEntityFromPath(
+                  board,
+                  dropPath.slice(0, -1)
+                ) as Lane | null;
+
+                if (
+                  movedToNewLane &&
+                  isDoneLane(destinationLane) &&
+                  stateManager.getSetting('celebrate-completions')
+                ) {
                   maybeCelebrate(win);
                 }
+
                 return next;
               }
               return entity;
@@ -209,7 +221,7 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
           const toInsert: Nestable[] = [];
 
           if (entity.type === DataTypes.Item) {
-            const { next, replacement, becameComplete } = maybeCompleteForMove(
+            const { next, replacement } = maybeCompleteForMove(
               sourceStateManager,
               sourceBoard,
               dragPath,
@@ -221,7 +233,15 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
             replacementEntity = replacement!;
             toInsert.push(next);
 
-            if (becameComplete && destinationStateManager.getSetting('celebrate-completions')) {
+            const destinationLane = getEntityFromPath(
+              destinationBoard,
+              dropPath.slice(0, -1)
+            ) as Lane | null;
+
+            if (
+              isDoneLane(destinationLane) &&
+              destinationStateManager.getSetting('celebrate-completions')
+            ) {
               maybeCelebrate(win);
             }
           } else {
