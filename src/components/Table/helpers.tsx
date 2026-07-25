@@ -6,11 +6,11 @@ import {
   SortingState,
   createColumnHelper,
 } from '@tanstack/react-table';
-import classcat from 'classcat';
 import moment from 'moment';
 import { useCallback, useContext, useMemo, useRef, useState } from 'preact/hooks';
 import { StateManager } from 'src/StateManager';
 import { c } from 'src/components/helpers';
+import { classcat } from 'src/helpers/util';
 import { defaultSort } from 'src/helpers/util';
 import { t } from 'src/lang/helpers';
 import { getDataviewPlugin, lableToName, taskFields } from 'src/parsers/helpers/inlineMetadata';

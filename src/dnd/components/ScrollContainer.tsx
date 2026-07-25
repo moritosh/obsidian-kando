@@ -1,6 +1,6 @@
-import classcat from 'classcat';
 import { ComponentChildren } from 'preact';
 import { c } from 'src/components/helpers';
+import { classcat } from 'src/helpers/util';
 
 import { useStoredScrollState } from './ScrollStateContext';
 import { Scrollable } from './Scrollable';

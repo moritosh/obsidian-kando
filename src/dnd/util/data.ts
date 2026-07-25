@@ -1,9 +1,51 @@
-import merge from 'deepmerge';
 import update, { Spec } from 'immutability-helper';
-import { isPlainObject } from 'is-plain-object';
+import { isPlainObject } from 'src/helpers/util';
 
 import { Nestable, Path } from '../types';
 import { SiblingDirection, getSiblingDirection } from './path';
+
+type Mergeable = Record<string, unknown> | unknown[];
+
+function isMergeable(value: unknown): value is Mergeable {
+  return isPlainObject(value) || Array.isArray(value);
+}
+
+function cloneMergeable<T>(value: T): T {
+  return isMergeable(value) ? (mergeSpecs(Array.isArray(value) ? [] : {}, value) as T) : value;
+}
+
+// Merges two immutability-helper mutation specs into one, so a remove and an
+// insert can be applied to the board in a single `update()` call. Where both
+// specs touch the same array (e.g. `$splice`), the operations are
+// concatenated rather than one replacing the other.
+function mergeSpecs<T extends Mergeable>(target: T, source: T): T {
+  if (Array.isArray(source) !== Array.isArray(target)) {
+    return cloneMergeable(source);
+  }
+
+  if (Array.isArray(source) && Array.isArray(target)) {
+    return target.concat(source).map(cloneMergeable) as T;
+  }
+
+  const targetObj = target as Record<string, unknown>;
+  const sourceObj = source as Record<string, unknown>;
+  const destination: Record<string, unknown> = {};
+
+  for (const key of Object.keys(targetObj)) {
+    destination[key] = cloneMergeable(targetObj[key]);
+  }
+
+  for (const key of Object.keys(sourceObj)) {
+    const sourceValue = sourceObj[key];
+    if (Object.prototype.hasOwnProperty.call(targetObj, key) && isMergeable(sourceValue)) {
+      destination[key] = mergeSpecs(targetObj[key] as Mergeable, sourceValue as Mergeable);
+    } else {
+      destination[key] = cloneMergeable(sourceValue);
+    }
+  }
+
+  return destination as T;
+}
 
 export function getEntityFromPath(root: Nestable, path: Path): Nestable {
   const step = path.length ? path[0] : null;
@@ -102,11 +144,10 @@ export function moveEntity(
     destinationModifier
   );
 
-  const mutation = merge<Spec<Nestable>>(removeMutation, insertMutation, {
-    isMergeableObject: (val) => {
-      return isPlainObject(val) || Array.isArray(val);
-    },
-  });
+  const mutation = mergeSpecs(
+    removeMutation as Mergeable,
+    insertMutation as Mergeable
+  ) as Spec<Nestable>;
 
   const newBoard = update(root, mutation);
 

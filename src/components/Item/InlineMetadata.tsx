@@ -1,6 +1,6 @@
-import classcat from 'classcat';
 import { useContext } from 'preact/compat';
 import { StateManager } from 'src/StateManager';
+import { classcat } from 'src/helpers/util';
 import {
   getDataviewPlugin,
   lableToIcon,

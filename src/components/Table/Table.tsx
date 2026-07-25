@@ -5,10 +5,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import classcat from 'classcat';
 import update from 'immutability-helper';
 import { useEffect, useMemo, useRef } from 'preact/compat';
 import { IntersectionObserverHandler } from 'src/dnd/managers/ScrollManager';
+import { classcat } from 'src/helpers/util';
 
 import { StateManager } from '../../StateManager';
 import { Icon } from '../Icon/Icon';

@@ -1,5 +1,3 @@
-import animateScrollTo from 'animated-scroll-to';
-import classcat from 'classcat';
 import update from 'immutability-helper';
 import { Fragment, memo, useCallback, useContext, useMemo, useRef, useState } from 'preact/compat';
 import {
@@ -12,6 +10,8 @@ import { ScrollContainer } from 'src/dnd/components/ScrollContainer';
 import { SortPlaceholder } from 'src/dnd/components/SortPlaceholder';
 import { Sortable, StaticSortable } from 'src/dnd/components/Sortable';
 import { useDragHandle } from 'src/dnd/managers/DragManager';
+import { animateScrollTo } from 'src/helpers/scrollTo';
+import { classcat } from 'src/helpers/util';
 import { frontmatterKey } from 'src/parsers/common';
 import { getTaskStatusDone } from 'src/parsers/helpers/inlineMetadata';
 

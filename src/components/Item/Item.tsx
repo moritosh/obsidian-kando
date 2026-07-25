@@ -1,4 +1,3 @@
-import classcat from 'classcat';
 import {
   JSX,
   memo,
@@ -12,6 +11,7 @@ import {
 import { Droppable, useNestedEntityPath } from 'src/dnd/components/Droppable';
 import { DndManagerContext } from 'src/dnd/components/context';
 import { useDragHandle } from 'src/dnd/managers/DragManager';
+import { classcat } from 'src/helpers/util';
 import { frontmatterKey } from 'src/parsers/common';
 
 import { KanbanContext, SearchContext } from '../context';

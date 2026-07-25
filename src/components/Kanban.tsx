@@ -1,5 +1,3 @@
-import animateScrollTo from 'animated-scroll-to';
-import classcat from 'classcat';
 import update from 'immutability-helper';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/compat';
 import { KanbanView } from 'src/KanbanView';
@@ -9,6 +7,8 @@ import { ScrollContainer } from 'src/dnd/components/ScrollContainer';
 import { SortPlaceholder } from 'src/dnd/components/SortPlaceholder';
 import { Sortable } from 'src/dnd/components/Sortable';
 import { createHTMLDndHandlers } from 'src/dnd/managers/DragManager';
+import { animateScrollTo } from 'src/helpers/scrollTo';
+import { classcat } from 'src/helpers/util';
 import { t } from 'src/lang/helpers';
 
 import { DndScope } from '../dnd/components/Scope';

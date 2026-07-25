@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import classcat from 'classcat';
 import Mark from 'mark.js';
 import moment from 'moment';
 import { Component, MarkdownRenderer as ObsidianRenderer, getLinkpath } from 'obsidian';
@@ -7,6 +6,7 @@ import { CSSProperties, memo, useEffect, useRef } from 'preact/compat';
 import { useContext } from 'preact/hooks';
 import { KanbanView } from 'src/KanbanView';
 import { DndManagerContext, EntityManagerContext } from 'src/dnd/components/context';
+import { classcat } from 'src/helpers/util';
 import { PromiseCapability } from 'src/helpers/util';
 
 import { applyCheckboxIndexes } from '../../helpers/renderMarkdown';
@@ -149,7 +149,10 @@ export class BasicMarkdownRenderer extends Component {
       'contextmenu',
       (evt) => {
         const { targetNode } = evt;
-        if (targetNode!.instanceOf(HTMLElement) && targetNode!.hasClass('task-list-item-checkbox')) {
+        if (
+          targetNode!.instanceOf(HTMLElement) &&
+          targetNode!.hasClass('task-list-item-checkbox')
+        ) {
           evt.preventDefault();
           evt.stopPropagation();
         }

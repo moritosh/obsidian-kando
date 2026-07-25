@@ -1,9 +1,8 @@
-import classcat from 'classcat';
 import { Menu } from 'obsidian';
 import { JSX, memo, useCallback, useContext, useState } from 'preact/compat';
-import isEqual from 'react-fast-compare';
 import { ExplicitPathContext } from 'src/dnd/components/context';
 import { moveEntity } from 'src/dnd/util/data';
+import { classcat, isEqual } from 'src/helpers/util';
 
 import { Icon } from '../Icon/Icon';
 import { DateAndTime, RelativeDate } from '../Item/DateAndTime';

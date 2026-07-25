@@ -1,8 +1,8 @@
-import classcat from 'classcat';
 import { getLinkpath } from 'obsidian';
-import { moment } from 'src/helpers/moment';
 import { JSX, useMemo } from 'preact/compat';
 import { StateManager } from 'src/StateManager';
+import { moment } from 'src/helpers/moment';
+import { classcat } from 'src/helpers/util';
 import { t } from 'src/lang/helpers';
 
 import { c } from '../helpers';

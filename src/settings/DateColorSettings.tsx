@@ -1,7 +1,7 @@
-import classcat from 'classcat';
 import update from 'immutability-helper';
-import { moment } from 'src/helpers/moment';
 import Preact from 'preact/compat';
+import { moment } from 'src/helpers/moment';
+import { classcat } from 'src/helpers/util';
 
 import { Icon } from '../components/Icon/Icon';
 import { c, generateInstanceId } from '../components/helpers';

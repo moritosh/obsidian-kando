@@ -1,6 +1,7 @@
-import { isPlainObject } from 'is-plain-object';
 import moment from 'moment';
 import { getAPI } from 'obsidian-dataview';
+
+import { isPlainObject } from './util';
 
 type Key = string | number;
 type Diffable = Record<Key, any> | any[];

@@ -1,12 +1,11 @@
-import classcat from 'classcat';
-import { isPlainObject } from 'is-plain-object';
 import { TFile } from 'obsidian';
-import { moment } from 'src/helpers/moment';
 import { getAPI } from 'obsidian-dataview';
 import { ComponentChild } from 'preact';
 import { memo, useContext, useMemo } from 'preact/compat';
 import { KanbanView } from 'src/KanbanView';
 import { StateManager } from 'src/StateManager';
+import { moment } from 'src/helpers/moment';
+import { classcat, isPlainObject } from 'src/helpers/util';
 import { InlineField, taskFields } from 'src/parsers/helpers/inlineMetadata';
 
 import { MarkdownRenderer } from '../MarkdownRenderer/MarkdownRenderer';

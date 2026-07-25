@@ -1,7 +1,7 @@
-import classcat from 'classcat';
 import update from 'immutability-helper';
 import { JSX, createPortal, render, unmountComponentAtNode } from 'preact/compat';
 import { Dispatch, StateUpdater, useContext, useEffect, useRef, useState } from 'preact/hooks';
+import { classcat } from 'src/helpers/util';
 
 import { Icon } from '../components/Icon/Icon';
 import { c, generateInstanceId, noop, useIMEInputProps } from '../components/helpers';

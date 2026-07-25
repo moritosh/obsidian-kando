@@ -1,12 +1,6 @@
 type HTMLAttributes<T extends EventTarget> = import('preact/compat').HTMLAttributes<T> &
   AriaAttributes;
 
-// is-plain-object@5's package.json "exports" map omits a "types" condition, so
-// TS can't resolve its shipped is-plain-object.d.ts under "bundler" resolution.
-declare module 'is-plain-object' {
-  export function isPlainObject(o: any): boolean;
-}
-
 declare const app: import('obsidian').App;
 
 // Obsidian's desktop renderer runs with Node/Electron integration enabled,
@@ -73,15 +67,7 @@ interface AriaAttributes {
   'aria-controls'?: string | undefined;
   /** Indicates the element that represents the current item within a container or set of related elements. */
   'aria-current'?:
-    | boolean
-    | 'false'
-    | 'true'
-    | 'page'
-    | 'step'
-    | 'location'
-    | 'date'
-    | 'time'
-    | undefined;
+    boolean | 'false' | 'true' | 'page' | 'step' | 'location' | 'date' | 'time' | undefined;
   /**
    * Identifies the element (or elements) that describes the object.
    * @see aria-labelledby
@@ -121,15 +107,7 @@ interface AriaAttributes {
   'aria-grabbed'?: Booleanish | undefined;
   /** Indicates the availability and type of interactive popup element, such as menu or dialog, that can be triggered by an element. */
   'aria-haspopup'?:
-    | boolean
-    | 'false'
-    | 'true'
-    | 'menu'
-    | 'listbox'
-    | 'tree'
-    | 'grid'
-    | 'dialog'
-    | undefined;
+    boolean | 'false' | 'true' | 'menu' | 'listbox' | 'tree' | 'grid' | 'dialog' | undefined;
   /**
    * Indicates whether the element is exposed to an accessibility API.
    * @see aria-disabled.

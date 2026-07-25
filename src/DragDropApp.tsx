@@ -1,6 +1,6 @@
-import classcat from 'classcat';
 import update from 'immutability-helper';
 import { JSX, createPortal, memo, useCallback, useMemo } from 'preact/compat';
+import { classcat } from 'src/helpers/util';
 
 import { KanbanView } from './KanbanView';
 import { DraggableItem } from './components/Item/Item';

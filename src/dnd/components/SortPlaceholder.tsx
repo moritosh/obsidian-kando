@@ -1,6 +1,6 @@
-import classcat from 'classcat';
 import { useMemo, useRef } from 'preact/compat';
 import { c, generateInstanceId } from 'src/components/helpers';
+import { classcat } from 'src/helpers/util';
 
 import { EntityData, WithChildren } from '../types';
 import { Droppable } from './Droppable';

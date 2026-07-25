@@ -1,7 +1,7 @@
 import { EditorView, ViewUpdate } from '@codemirror/view';
-import classcat from 'classcat';
 import { Dispatch, StateUpdater, useCallback, useContext, useEffect, useRef } from 'preact/hooks';
 import { laneTitleWithMaxItems } from 'src/helpers';
+import { classcat } from 'src/helpers/util';
 
 import { MarkdownEditor, allowNewLine } from '../Editor/MarkdownEditor';
 import { MarkdownRenderer } from '../MarkdownRenderer/MarkdownRenderer';
