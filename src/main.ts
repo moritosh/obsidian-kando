@@ -48,7 +48,7 @@ function getEditorClass(app: any) {
 export default class KanbanPlugin extends Plugin {
   // Assigned during onload(), per Obsidian's plugin lifecycle contract.
   settingsTab!: KanbanSettingsTab;
-  settings: KanbanSettings = {};
+  override settings: KanbanSettings = {};
 
   // leafid => view mode
   kanbanFileModes: Record<string, string> = {};
@@ -68,7 +68,7 @@ export default class KanbanPlugin extends Plugin {
     await this.saveData(this.settings);
   }
 
-  unload(): void {
+  override unload(): void {
     super.unload();
     Promise.all(
       this.app.workspace.getLeavesOfType(kanbanViewType).map((leaf) => {
@@ -78,7 +78,7 @@ export default class KanbanPlugin extends Plugin {
     );
   }
 
-  onunload() {
+  override onunload() {
     this.MarkdownEditor = null;
     this.windowRegistry.forEach((reg, win) => {
       reg.viewStateReceivers.forEach((fn) => fn([]));
@@ -96,7 +96,7 @@ export default class KanbanPlugin extends Plugin {
 
   MarkdownEditor: any;
 
-  async onload() {
+  override async onload() {
     await this.loadSettings();
 
     this.MarkdownEditor = getEditorClass(this.app);

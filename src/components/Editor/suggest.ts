@@ -29,7 +29,7 @@ export function matchDateTrigger(dateTrigger: string, editor: Editor, cursor: Ed
 
 export class DateSuggest extends EditorSuggest<[]> {
   plugin: KanbanPlugin;
-  app: App;
+  override app: App;
   declare suggestEl: HTMLElement;
 
   get stateManager() {
@@ -139,7 +139,7 @@ export class DateSuggest extends EditorSuggest<[]> {
     };
   }
 
-  close() {
+  override close() {
     super.close();
 
     if (this.datepicker) {
@@ -217,7 +217,7 @@ export class TimeSuggest extends EditorSuggest<string> {
     context!.editor.focus();
   }
 
-  close(): void {
+  override close(): void {
     super.close();
     this.times = null;
   }

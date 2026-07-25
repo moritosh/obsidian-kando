@@ -83,7 +83,7 @@ export class BasicMarkdownRenderer extends Component {
     this.renderCapability = new PromiseCapability<void>();
   }
 
-  onload() {
+  override onload() {
     this.render();
   }
 

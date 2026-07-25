@@ -1550,7 +1550,7 @@ export class SettingsModal extends Modal {
     this.settingsManager = new SettingsManager(view.plugin, config, settings);
   }
 
-  onOpen() {
+  override onOpen() {
     const { contentEl, modalEl } = this;
 
     modalEl.addClass(c('board-settings-modal'));
@@ -1558,7 +1558,7 @@ export class SettingsModal extends Modal {
     this.settingsManager.constructUI(contentEl, this.view.file!.basename, true);
   }
 
-  onClose() {
+  override onClose() {
     const { contentEl } = this;
 
     this.settingsManager.cleanUp();
@@ -1576,7 +1576,7 @@ export class KanbanSettingsTab extends PluginSettingTab {
     this.settingsManager = new SettingsManager(plugin, config, plugin.settings);
   }
 
-  display() {
+  override display() {
     const { containerEl } = this;
 
     containerEl.empty();

@@ -11,6 +11,7 @@
     "lib": ["dom", "es6", "scripthost", "es2018", "es2019.string"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "noImplicitOverride": true,
     "strict": true,
     "paths": {
       "*": ["./*"],

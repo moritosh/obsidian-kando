@@ -136,11 +136,11 @@ export class KanbanView extends TextFileView implements HoverParent {
     return kanbanViewType;
   }
 
-  getIcon() {
+  override getIcon() {
     return kanbanIcon;
   }
 
-  getDisplayText() {
+  override getDisplayText() {
     return this.file?.basename || 'Kanban';
   }
 
@@ -155,7 +155,7 @@ export class KanbanView extends TextFileView implements HoverParent {
     return super.loadFile(file);
   }
 
-  async onLoadFile(file: TFile) {
+  override async onLoadFile(file: TFile) {
     try {
       return await super.onLoadFile(file);
     } catch (e) {
@@ -165,7 +165,7 @@ export class KanbanView extends TextFileView implements HoverParent {
     }
   }
 
-  onload() {
+  override onload() {
     super.onload();
     if (Platform.isMobile) {
       this.containerEl.setCssProps({
@@ -181,7 +181,7 @@ export class KanbanView extends TextFileView implements HoverParent {
     );
   }
 
-  onunload(): void {
+  override onunload(): void {
     super.onunload();
 
     this.previewQueue.clear();
@@ -239,12 +239,12 @@ export class KanbanView extends TextFileView implements HoverParent {
     this.plugin.addView(this, data, !clear && this.isPrimary);
   }
 
-  async setState(state: any, result: ViewStateResult): Promise<void> {
+  override async setState(state: any, result: ViewStateResult): Promise<void> {
     this.viewSettings = { ...state.kanbanViewState };
     await super.setState(state, result);
   }
 
-  getState() {
+  override getState() {
     const state = super.getState();
     state.kanbanViewState = { ...this.viewSettings };
     return state;
@@ -313,7 +313,7 @@ export class KanbanView extends TextFileView implements HoverParent {
     ).open();
   }
 
-  onPaneMenu(menu: Menu, source: string, callSuper: boolean = true) {
+  override onPaneMenu(menu: Menu, source: string, callSuper: boolean = true) {
     if (source !== 'more-options') {
       super.onPaneMenu(menu, source);
       return;

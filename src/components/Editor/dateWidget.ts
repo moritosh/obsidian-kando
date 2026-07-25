@@ -35,7 +35,7 @@ class DateTimeWidget extends WidgetType {
     this.date = date;
   }
 
-  eq(widget: this): boolean {
+  override eq(widget: this): boolean {
     return this.date.isSame(widget.date);
   }
 
@@ -57,7 +57,7 @@ class DateTimeWidget extends WidgetType {
     );
   }
 
-  ignoreEvent(): boolean {
+  override ignoreEvent(): boolean {
     return false;
   }
 }
