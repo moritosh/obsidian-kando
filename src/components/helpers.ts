@@ -42,7 +42,7 @@ export function maybeCompleteForMove(
   destinationBoard: Board,
   destinationPath: Path,
   item: Item
-): { next: Item; replacement?: Item } {
+): { next: Item; replacement?: Item; becameComplete?: boolean } {
   const sourceParent = getEntityFromPath(sourceBoard, sourcePath.slice(0, -1));
   const destinationParent = getEntityFromPath(destinationBoard, destinationPath.slice(0, -1));
 
@@ -56,6 +56,8 @@ export function maybeCompleteForMove(
 
   // If it already matches the new lane, leave it alone
   if (newShouldComplete === isComplete) return { next: item };
+
+  const becameComplete = !!newShouldComplete;
 
   if (newShouldComplete) {
     item = update(item, { data: { checkChar: { $set: getTaskStatusPreDone() } } });
@@ -76,11 +78,12 @@ export function maybeCompleteForMove(
       }
     });
 
-    return { next, replacement };
+    return { next, replacement, becameComplete };
   }
 
   // It's different, update it
   return {
+    becameComplete,
     next: update(item, {
       data: {
         checked: {

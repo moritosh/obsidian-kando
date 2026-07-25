@@ -1732,6 +1732,55 @@ body:not(.native-scrollbars) .kanban-plugin__scroll-container::-webkit-scrollbar
   }
 }
 
+.kanban-plugin__celebrate-unicorn {
+  position: fixed;
+  top: var(--kanban-celebrate-top, 20%);
+  left: -15%;
+  z-index: 10001;
+  font-size: 48px;
+  line-height: 1;
+  pointer-events: none;
+  will-change: transform;
+  animation: kanban-plugin-celebrate-fly 2.8s cubic-bezier(0.33, 0, 0.2, 1) forwards;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    width: 200px;
+    height: 8px;
+    margin-right: 4px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    opacity: 0.85;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #ff453a,
+      #ff9f0a,
+      #ffd60a,
+      #32d74b,
+      #0a84ff,
+      #bf5af2
+    );
+  }
+}
+
+@keyframes kanban-plugin-celebrate-fly {
+  0% {
+    left: -15%;
+    transform: translateY(0) rotate(-6deg);
+  }
+  50% {
+    transform: translateY(-30px) rotate(4deg);
+  }
+  100% {
+    left: 115%;
+    transform: translateY(10px) rotate(-4deg);
+  }
+}
+
 .kanban-plugin__color-picker-wrapper {
   position: relative;
 }

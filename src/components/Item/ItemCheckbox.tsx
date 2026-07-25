@@ -2,6 +2,7 @@ import update from 'immutability-helper';
 import { memo, useCallback, useEffect, useState } from 'preact/compat';
 import { StateManager } from 'src/StateManager';
 import { Path } from 'src/dnd/types';
+import { maybeCelebrate } from 'src/helpers/celebrate';
 import { getTaskStatusDone, toggleTask } from 'src/parsers/helpers/inlineMetadata';
 
 import { BoardModifiers } from '../../helpers/boardModifiers';
@@ -30,6 +31,13 @@ export const ItemCheckbox = memo(function ItemCheckbox({
   const [isHoveringCheckbox, setIsHoveringCheckbox] = useState(false);
 
   const onCheckboxChange = useCallback(() => {
+    const wasChecked = item.data.checked;
+    const celebrateIfNewlyChecked = (nowChecked: boolean | undefined) => {
+      if (!wasChecked && nowChecked && stateManager.getSetting('celebrate-completions')) {
+        maybeCelebrate(activeWindow);
+      }
+    };
+
     const updates = toggleTask(item, stateManager.file);
     if (updates) {
       const [itemStrings, checkChars, thisIndex] = updates;
@@ -40,7 +48,10 @@ export const ItemCheckbox = memo(function ItemCheckbox({
       });
 
       boardModifiers.replaceItem(path, replacements);
+      celebrateIfNewlyChecked(replacements[thisIndex]?.data.checked);
     } else {
+      const nowChecked = !wasChecked;
+
       boardModifiers.updateItem(
         path,
         update(item, {
@@ -54,6 +65,8 @@ export const ItemCheckbox = memo(function ItemCheckbox({
           },
         })
       );
+
+      celebrateIfNewlyChecked(nowChecked);
     }
   }, [item, stateManager, boardModifiers, ...path]);
 

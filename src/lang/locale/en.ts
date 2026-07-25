@@ -76,6 +76,9 @@ const en = {
   'Display card checkbox': 'Display card checkbox',
   'When toggled, a checkbox will be displayed with each card':
     'When toggled, a checkbox will be displayed with each card',
+  'Celebrate completions': 'Celebrate completions',
+  'When toggled, completing a card (via its checkbox or by moving it to a list marked "Mark items as complete") occasionally shows a flying unicorn.':
+    'When toggled, completing a card (via its checkbox or by moving it to a list marked "Mark items as complete") occasionally shows a flying unicorn.',
   'Reset to default': 'Reset to default',
   'Date & Time': 'Date & Time',
   'Date trigger': 'Date trigger',

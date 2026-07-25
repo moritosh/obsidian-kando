@@ -55,6 +55,7 @@ export interface KanbanSettings {
   'archive-date-format'?: string;
   'archive-date-separator'?: string;
   'archive-with-date'?: boolean;
+  'celebrate-completions'?: boolean;
   'date-colors'?: DateColor[];
   'date-display-format'?: string;
   'date-format'?: string;
@@ -103,6 +104,7 @@ export const settingKeyLookup: Set<keyof KanbanSettings> = new Set([
   'archive-date-format',
   'archive-date-separator',
   'archive-with-date',
+  'celebrate-completions',
   'date-colors',
   'date-display-format',
   'date-format',
@@ -242,6 +244,50 @@ export class SettingsManager {
 
                 this.applySettingsUpdate({
                   $unset: ['show-checkboxes'],
+                });
+              });
+          });
+      });
+
+    new Setting(contentEl)
+      .setName(t('Celebrate completions'))
+      .setDesc(
+        t(
+          'When toggled, completing a card (via its checkbox or by moving it to a list marked "Mark items as complete") occasionally shows a flying unicorn.'
+        )
+      )
+      .then((setting) => {
+        let toggleComponent: ToggleComponent;
+
+        setting
+          .addToggle((toggle) => {
+            toggleComponent = toggle;
+
+            const [value, globalValue] = this.getSetting('celebrate-completions', local);
+
+            if (value !== undefined) {
+              toggle.setValue(value as boolean);
+            } else if (globalValue !== undefined) {
+              toggle.setValue(globalValue as boolean);
+            }
+
+            toggle.onChange((newValue) => {
+              this.applySettingsUpdate({
+                'celebrate-completions': {
+                  $set: newValue,
+                },
+              });
+            });
+          })
+          .addExtraButton((b) => {
+            b.setIcon('lucide-rotate-ccw')
+              .setTooltip(t('Reset to default'))
+              .onClick(() => {
+                const [, globalValue] = this.getSetting('celebrate-completions', local);
+                toggleComponent.setValue(!!globalValue);
+
+                this.applySettingsUpdate({
+                  $unset: ['celebrate-completions'],
                 });
               });
           });
