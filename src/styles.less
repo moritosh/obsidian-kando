@@ -1732,15 +1732,20 @@ body:not(.native-scrollbars) .kanban-plugin__scroll-container::-webkit-scrollbar
   }
 }
 
-.kanban-plugin__celebrate-unicorn {
+// Flies diagonally from the lower-left corner to the upper-right corner.
+// The whole element (creature + trail) is rotated to match that ~45deg
+// heading, so the rainbow trail (drawn to the left of the creature in its
+// own local space) ends up streaming out behind it down toward the
+// lower-left, however the drift/scale wobbles during flight.
+.kanban-plugin__celebrate-creature {
   position: fixed;
-  top: var(--kanban-celebrate-top, 20%);
-  left: -15%;
+  left: -10%;
+  top: calc(100% + var(--kanban-celebrate-drift, 0%));
   z-index: 10001;
-  font-size: 48px;
+  font-size: 52px;
   line-height: 1;
   pointer-events: none;
-  will-change: transform;
+  will-change: transform, left, top, opacity;
   animation: kanban-plugin-celebrate-fly 2.8s cubic-bezier(0.33, 0, 0.2, 1) forwards;
 
   &::before {
@@ -1748,8 +1753,8 @@ body:not(.native-scrollbars) .kanban-plugin__scroll-container::-webkit-scrollbar
     position: absolute;
     top: 50%;
     right: 100%;
-    width: 200px;
-    height: 8px;
+    width: 220px;
+    height: 10px;
     margin-right: 4px;
     transform: translateY(-50%);
     border-radius: 999px;
@@ -1769,15 +1774,27 @@ body:not(.native-scrollbars) .kanban-plugin__scroll-container::-webkit-scrollbar
 
 @keyframes kanban-plugin-celebrate-fly {
   0% {
-    left: -15%;
-    transform: translateY(0) rotate(-6deg);
+    left: -10%;
+    top: calc(102% + var(--kanban-celebrate-drift, 0%));
+    transform: rotate(-48deg) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
   }
   50% {
-    transform: translateY(-30px) rotate(4deg);
+    left: 50%;
+    top: calc(38% + var(--kanban-celebrate-drift, 0%));
+    transform: rotate(-42deg) scale(1.05);
+  }
+  90% {
+    opacity: 1;
   }
   100% {
-    left: 115%;
-    transform: translateY(10px) rotate(-4deg);
+    left: 112%;
+    top: calc(-14% + var(--kanban-celebrate-drift, 0%));
+    transform: rotate(-48deg) scale(0.85);
+    opacity: 0;
   }
 }
 

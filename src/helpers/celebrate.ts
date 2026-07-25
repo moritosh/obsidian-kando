@@ -6,6 +6,10 @@ import { Lane } from '../components/types';
 const CELEBRATION_CHANCE = 0.35;
 const CELEBRATION_DURATION_MS = 2800;
 
+// A random cast of creatures, each flying up and to the right with a
+// rainbow trail behind it.
+const CREATURES = ['🦄', '🐉', '🦦', '🐳', '🦩'];
+
 const DONE_LANE_NAME_PATTERN = /\b(done|complete|completed|finished)\b/i;
 
 // A lane counts as a "done" list either because the user explicitly marked
@@ -21,15 +25,17 @@ export function maybeCelebrate(win: Window): void {
   if (Math.random() >= CELEBRATION_CHANCE) return;
 
   const doc = win.document;
-  const unicorn = doc.createElement('div');
+  const creature = doc.createElement('div');
 
-  unicorn.className = c('celebrate-unicorn');
-  unicorn.textContent = '🦄';
-  unicorn.style.setProperty('--kanban-celebrate-top', `${10 + Math.random() * 60}%`);
+  creature.className = c('celebrate-creature');
+  creature.textContent = CREATURES[Math.floor(Math.random() * CREATURES.length)];
+  // Nudges the whole bottom-left-to-top-right flight path up or down a bit
+  // so repeated celebrations don't all trace the exact same line.
+  creature.style.setProperty('--kanban-celebrate-drift', `${(Math.random() - 0.5) * 16}%`);
 
-  const cleanup = () => unicorn.remove();
-  unicorn.addEventListener('animationend', cleanup, { once: true });
+  const cleanup = () => creature.remove();
+  creature.addEventListener('animationend', cleanup, { once: true });
   win.setTimeout(cleanup, CELEBRATION_DURATION_MS + 500);
 
-  doc.body.appendChild(unicorn);
+  doc.body.appendChild(creature);
 }
