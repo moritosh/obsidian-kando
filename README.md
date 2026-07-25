@@ -32,6 +32,18 @@ yarn test          # run the Vitest suite
 yarn lint          # eslint (currently broken: typescript-eslint doesn't yet support TS 7)
 ```
 
+## Changelog
+
+### 1.1.0
+
+- Added an optional **Celebrate completions** setting: checking off a card, or moving it to a list named (or explicitly marked as) "Done", has a chance to send a random creature (unicorn, dragon, otter, whale, or flamingo) flying across the screen with a rainbow trail. Off by default; enable it in the plugin settings or per-board.
+- Trimmed several small runtime dependencies (`classcat`, `is-plain-object`, `deepmerge`, `react-fast-compare`, `animated-scroll-to`, and a few others) in favor of inlined implementations, shrinking the plugin's bundle.
+- Enabled `noImplicitOverride` and hardened external card links to only follow `http(s)` URLs.
+
+### 1.0.0
+
+- Initial release of this fork: rebranded as obsidian-kando, rebased on the current TypeScript/toolchain with strict null checks, and added a Vitest suite covering the markdown parser and drag-and-drop data layer.
+
 ## License
 
 GNU GPLv3 (or later) — see [LICENSE.md](./LICENSE.md). This is a derivative work of [obsidian-community/obsidian-kanban](https://github.com/obsidian-community/obsidian-kanban), also GPLv3.
