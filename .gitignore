@@ -6,11 +6,13 @@
 node_modules
 package-lock.json
 
+# yarn
+yarn-error.log
+
 # build
 .DS_Store
 *.js.map
 .env
-yarn*
 dist
 test-vault/
 build/
