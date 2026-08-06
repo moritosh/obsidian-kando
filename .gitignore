@@ -2,11 +2,14 @@
 *.iml
 .idea
 
-# npm
+# pnpm (pnpm-lock.yaml is tracked)
 node_modules
-package-lock.json
+.pnpm-store/
+pnpm-debug.log*
 
-# yarn
+# other package managers — this repo uses pnpm only
+package-lock.json
+yarn.lock
 yarn-error.log
 
 # build

@@ -15,22 +15,24 @@ This is a personal fork/continuation of [obsidian-community/obsidian-kanban](htt
 
 This plugin isn't in the community plugin store. To install manually:
 
-1. Run `yarn build` (see below).
+1. Run `pnpm build` (see below).
 2. Copy `build/obsidian-kando/` into your vault's `.obsidian/plugins/obsidian-kando/` folder (or symlink it there).
 3. Reload Obsidian and enable **Kando** under Settings → Community plugins.
 
 ## Development
 
-Requires [Yarn](https://yarnpkg.com/) (this repo doesn't use npm/pnpm).
+Requires [pnpm](https://pnpm.io/) (this repo doesn't use npm/yarn). The version is pinned via the `packageManager` field, so `corepack enable` is enough to get the right one.
 
 ```sh
-yarn install       # install dependencies
-yarn dev           # esbuild in watch mode
-yarn build         # production build -> build/obsidian-kando/
-yarn typecheck     # tsc --noemit
-yarn test          # run the Vitest suite
-yarn lint          # eslint (currently broken: typescript-eslint doesn't yet support TS 7)
+pnpm install       # install dependencies
+pnpm dev           # esbuild in watch mode
+pnpm build         # production build -> build/obsidian-kando/
+pnpm typecheck     # tsc --noemit
+pnpm test          # run the Vitest suite
+pnpm lint          # eslint (currently broken: typescript-eslint doesn't yet support TS 7)
 ```
+
+Dependencies are pinned to exact versions — no `^` or `~` ranges — and `pnpm-lock.yaml` is committed. `.npmrc` sets `save-exact=true`, so `pnpm add <pkg>` pins automatically. To move a dependency, bump it deliberately (`pnpm update <pkg> --latest`) and commit the lockfile with it.
 
 ## Changelog
 
