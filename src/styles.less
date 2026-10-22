@@ -15,6 +15,18 @@
   --lane-width: 272px;
 }
 
+// Cards follow the input radius on desktop, but on mobile that turns into a
+// touch-sized radius that would make every card a pill. The drag container
+// is listed too, since a dragged card is drawn there, outside the board.
+.kanban-plugin,
+.kanban-plugin__drag-container {
+  --kanban-card-radius: var(--input-radius);
+
+  .is-mobile & {
+    --kanban-card-radius: var(--radius-m);
+  }
+}
+
 .kanban-plugin {
   contain: content;
   height: 100%;
@@ -618,7 +630,7 @@ button.kanban-plugin__lane-settings-button + button.kanban-plugin__lane-settings
     padding-inline: 8px;
     border: 1px solid var(--background-modifier-border);
     background-color: var(--background-primary);
-    border-radius: var(--input-radius);
+    border-radius: var(--kanban-card-radius);
     min-height: var(--input-height);
   }
 }
@@ -691,7 +703,7 @@ button.kanban-plugin__new-item-button {
 .kanban-plugin__item {
   font-size: 0.875rem;
   border: 1px solid var(--background-modifier-border);
-  border-radius: var(--input-radius);
+  border-radius: var(--kanban-card-radius);
   overflow: hidden;
   transition: 300ms opacity cubic-bezier(0.25, 1, 0.5, 1);
 

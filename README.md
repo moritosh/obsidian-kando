@@ -18,7 +18,9 @@ This plugin isn't in the community plugin store. To install it:
 2. Unzip it into your vault's `.obsidian/plugins/` folder, so the files end up in `.obsidian/plugins/obsidian-kando/`.
 3. Reload Obsidian and enable **Kando** under Settings → Community plugins.
 
-Each release also carries `main.js`, `manifest.json` and `styles.css` as separate files, so [BRAT](https://github.com/TfTHacker/obsidian42-brat) can install and update the plugin from this repository too. To run your own build instead, copy (or symlink) `build/obsidian-kando/` from `bun run build` into the plugins folder.
+Each release also carries `main.js`, `manifest.json` and `styles.css` as separate files, so [BRAT](https://github.com/TfTHacker/obsidian42-brat) can install and update the plugin from this repository too. That is the easiest way onto a phone or tablet, where unzipping into the vault is awkward; while the repository is private, BRAT needs a GitHub personal access token with read access to it. Alternatively, install the plugin on a computer and let your vault sync carry `.obsidian/plugins/obsidian-kando/` over.
+
+To run your own build instead, copy (or symlink) `build/obsidian-kando/` from `bun run build` into the plugins folder.
 
 ## Development
 
@@ -42,6 +44,10 @@ Dependencies are pinned to exact versions — no `^` or `~` ranges — and `bun.
 Add the changes under `### Unreleased` in the changelog below, commit, then run `bun run release <version>` on a clean `main`. It sets the version in `package.json`, `manifest.json` and `versions.json`, renames the changelog section to that version, commits, and pushes a tag like `1.2.0` (no `v`, since Obsidian matches tags to the manifest version). The `release` workflow then builds the plugin and publishes a GitHub release with the zip, the three plugin files, and that changelog section as its notes.
 
 ## Changelog
+
+### Unreleased
+
+- Cards on mobile have the same rounded corners as on desktop. They had turned into pills, because they took the radius Obsidian gives text inputs, which is touch-sized on mobile.
 
 ### 1.2.0
 
