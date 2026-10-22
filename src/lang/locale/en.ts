@@ -77,8 +77,8 @@ const en = {
   'When toggled, a checkbox will be displayed with each card':
     'When toggled, a checkbox will be displayed with each card',
   'Celebrate completions': 'Celebrate completions',
-  'When toggled, completing a card (via its checkbox or by moving it to a list marked "Done") occasionally sends a random creature flying across the screen with a rainbow trail.':
-    'When toggled, completing a card (via its checkbox or by moving it to a list marked "Done") occasionally sends a random creature flying across the screen with a rainbow trail.',
+  'When toggled, completing a card (via its checkbox or by moving it to a list marked "Done") bursts sparkles from it, and now and then a random creature launches from the card and swoops across the screen on a rainbow trail.':
+    'When toggled, completing a card (via its checkbox or by moving it to a list marked "Done") bursts sparkles from it, and now and then a random creature launches from the card and swoops across the screen on a rainbow trail.',
   'Reset to default': 'Reset to default',
   'Date & Time': 'Date & Time',
   'Date trigger': 'Date trigger',

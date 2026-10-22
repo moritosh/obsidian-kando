@@ -1,6 +1,6 @@
 import update from 'immutability-helper';
 import { JSX, createPortal, memo, useCallback, useMemo } from 'preact/compat';
-import { isDoneLane, maybeCelebrate } from 'src/helpers/celebrate';
+import { celebrate, isDoneLane } from 'src/helpers/celebrate';
 import { classcat } from 'src/helpers/util';
 
 import { KanbanView } from './KanbanView';
@@ -30,6 +30,13 @@ import {
 
 export function createApp(win: Window, plugin: KanbanPlugin) {
   return <DragDropApp win={win} plugin={plugin} />;
+}
+
+// Hitboxes are in the window's viewport coordinates, so the drop target's
+// center is where the card lands.
+function dropPoint(dropEntity: Entity) {
+  const [minX, minY, maxX, maxY] = dropEntity.getHitbox();
+  return { x: (minX + maxX) / 2, y: (minY + maxY) / 2 };
 }
 
 const View = memo(function View({ view }: { view: KanbanView }) {
@@ -139,7 +146,7 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
                   isDoneLane(destinationLane) &&
                   stateManager.getSetting('celebrate-completions')
                 ) {
-                  maybeCelebrate(win);
+                  celebrate(win, dropPoint(dropEntity));
                 }
 
                 return next;
@@ -242,7 +249,7 @@ export function DragDropApp({ win, plugin }: { win: Window; plugin: KanbanPlugin
               isDoneLane(destinationLane) &&
               destinationStateManager.getSetting('celebrate-completions')
             ) {
-              maybeCelebrate(win);
+              celebrate(win, dropPoint(dropEntity));
             }
           } else {
             toInsert.push(entity);

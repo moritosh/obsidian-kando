@@ -1,8 +1,8 @@
 import update from 'immutability-helper';
-import { memo, useCallback, useEffect, useState } from 'preact/compat';
+import { memo, useCallback, useEffect, useRef, useState } from 'preact/compat';
 import { StateManager } from 'src/StateManager';
 import { Path } from 'src/dnd/types';
-import { maybeCelebrate } from 'src/helpers/celebrate';
+import { celebrate } from 'src/helpers/celebrate';
 import { getTaskStatusDone, toggleTask } from 'src/parsers/helpers/inlineMetadata';
 
 import { BoardModifiers } from '../../helpers/boardModifiers';
@@ -29,12 +29,17 @@ export const ItemCheckbox = memo(function ItemCheckbox({
 
   const [isCtrlHoveringCheckbox, setIsCtrlHoveringCheckbox] = useState(false);
   const [isHoveringCheckbox, setIsHoveringCheckbox] = useState(false);
+  const checkboxRef = useRef<HTMLInputElement>(null);
 
   const onCheckboxChange = useCallback(() => {
     const wasChecked = item.data.checked;
     const celebrateIfNewlyChecked = (nowChecked: boolean | undefined) => {
       if (!wasChecked && nowChecked && stateManager.getSetting('celebrate-completions')) {
-        maybeCelebrate(activeWindow);
+        const rect = checkboxRef.current?.getBoundingClientRect();
+        celebrate(
+          activeWindow,
+          rect && { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+        );
       }
     };
 
@@ -114,6 +119,7 @@ export const ItemCheckbox = memo(function ItemCheckbox({
     >
       {shouldShowCheckbox && !isCtrlHoveringCheckbox && (
         <input
+          ref={checkboxRef}
           onChange={onCheckboxChange}
           type="checkbox"
           className="task-list-item-checkbox"

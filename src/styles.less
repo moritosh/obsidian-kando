@@ -1732,70 +1732,15 @@ body:not(.native-scrollbars) .kanban-plugin__scroll-container::-webkit-scrollbar
   }
 }
 
-// Flies diagonally from the lower-left corner to the upper-right corner.
-// The whole element (creature + trail) is rotated to match that ~45deg
-// heading, so the rainbow trail (drawn to the left of the creature in its
-// own local space) ends up streaming out behind it down toward the
-// lower-left, however the drift/scale wobbles during flight.
-.kanban-plugin__celebrate-creature {
+// Overlay for completion celebrations (see helpers/celebrate.ts), which draw
+// everything on this one canvas and remove it when they finish.
+.kanban-plugin__celebrate-canvas {
   position: fixed;
-  left: -10%;
-  top: calc(100% + var(--kanban-celebrate-drift, 0%));
-  z-index: 10001;
-  font-size: 52px;
-  line-height: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--layer-notice, 10001);
   pointer-events: none;
-  will-change: transform, left, top, opacity;
-  animation: kanban-plugin-celebrate-fly 2.8s cubic-bezier(0.33, 0, 0.2, 1) forwards;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 100%;
-    width: 220px;
-    height: 10px;
-    margin-right: 4px;
-    transform: translateY(-50%);
-    border-radius: 999px;
-    opacity: 0.85;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      #ff453a,
-      #ff9f0a,
-      #ffd60a,
-      #32d74b,
-      #0a84ff,
-      #bf5af2
-    );
-  }
-}
-
-@keyframes kanban-plugin-celebrate-fly {
-  0% {
-    left: -10%;
-    top: calc(102% + var(--kanban-celebrate-drift, 0%));
-    transform: rotate(-48deg) scale(0.8);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  50% {
-    left: 50%;
-    top: calc(38% + var(--kanban-celebrate-drift, 0%));
-    transform: rotate(-42deg) scale(1.05);
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    left: 112%;
-    top: calc(-14% + var(--kanban-celebrate-drift, 0%));
-    transform: rotate(-48deg) scale(0.85);
-    opacity: 0;
-  }
 }
 
 .kanban-plugin__color-picker-wrapper {

@@ -253,7 +253,7 @@ export class SettingsManager {
       .setName(t('Celebrate completions'))
       .setDesc(
         t(
-          'When toggled, completing a card (via its checkbox or by moving it to a list marked "Done") occasionally sends a random creature flying across the screen with a rainbow trail.'
+          'When toggled, completing a card (via its checkbox or by moving it to a list marked "Done") bursts sparkles from it, and now and then a random creature launches from the card and swoops across the screen on a rainbow trail.'
         )
       )
       .then((setting) => {
