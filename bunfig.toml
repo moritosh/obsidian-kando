@@ -1,0 +1,4 @@
+[install]
+# Dependencies are pinned to exact versions — no ^ / ~ ranges.
+# Keeps `bun add <pkg>` from reintroducing a minimum-version range.
+exact = true

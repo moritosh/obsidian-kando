@@ -1,0 +1,36 @@
+# `bun run release <version>` pushes a tag like 1.2.0 to publish a release.
+# Tags carry no "v": Obsidian and BRAT match them against manifest.json's version.
+name: release
+on:
+  push:
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Check the tag matches manifest.json
+        run: test "$VERSION" = "$(jq -r .version manifest.json)"
+      - run: bun run typecheck
+      - run: bun run test
+      - run: bun run build
+      - name: Package
+        run: |
+          cd build
+          zip -r "../obsidian-kando-$VERSION.zip" obsidian-kando
+      - name: Release notes from the README changelog
+        run: awk -v heading="### $VERSION" '$0 == heading {on = 1; next} on && /^##/ {exit} on' README.md > release-notes.md
+      - uses: softprops/action-gh-release@v3
+        with:
+          body_path: release-notes.md
+          files: |
+            build/obsidian-kando/main.js
+            build/obsidian-kando/manifest.json
+            build/obsidian-kando/styles.css
+            obsidian-kando-${{ github.ref_name }}.zip

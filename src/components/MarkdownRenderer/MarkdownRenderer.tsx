@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import Mark from 'mark.js';
 import moment from 'moment';
 import { Component, MarkdownRenderer as ObsidianRenderer, getLinkpath } from 'obsidian';
@@ -87,7 +86,6 @@ export class BasicMarkdownRenderer extends Component {
     this.render();
   }
 
-  // eslint-disable-next-line react/require-render-return
   async render() {
     this.containerEl.empty();
 

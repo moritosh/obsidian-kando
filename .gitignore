@@ -2,22 +2,18 @@
 *.iml
 .idea
 
-# pnpm (pnpm-lock.yaml is tracked)
+# bun (bun.lock is tracked)
 node_modules
-.pnpm-store/
-pnpm-debug.log*
 
-# other package managers — this repo uses pnpm only
+# other package managers — this repo uses bun only
 package-lock.json
+pnpm-lock.yaml
 yarn.lock
 yarn-error.log
 
 # build
 .DS_Store
-*.js.map
 .env
-dist
 test-vault/
 build/
-main.js
-styles.css
+*.zip

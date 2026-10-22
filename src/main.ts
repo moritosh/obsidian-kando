@@ -747,7 +747,6 @@ export default class KanbanPlugin extends Plugin {
 
     this.register(
       around(this.app.workspace, {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         setActiveLeaf(next) {
           return function (this: any, ...args: any[]) {
