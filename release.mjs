@@ -16,7 +16,9 @@ const fail = (message) => {
 if (!/^\d+\.\d+\.\d+$/.test(version ?? '')) {
   fail('Usage: bun run release <major.minor.patch>');
 }
-if ((await $`git status --porcelain`.text()).trim()) {
+// Untracked files are fine: the release commit only takes the files below,
+// and the release workflow builds from the tag.
+if ((await $`git status --porcelain --untracked-files=no`.text()).trim()) {
   fail('The working tree has uncommitted changes.');
 }
 if ((await $`git branch --show-current`.text()).trim() !== 'main') {
