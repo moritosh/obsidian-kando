@@ -43,7 +43,7 @@ Add the changes under `### Unreleased` in the changelog below, commit, then run 
 
 ## Changelog
 
-### Unreleased
+### 1.2.0
 
 - Switched the toolchain to [Bun](https://bun.sh/) for installing dependencies and running scripts; Node is no longer needed. Dependencies are pinned to exact versions.
 - Migrated to Preact 11 and `@tanstack/react-table` 9, and updated all other dependencies.
