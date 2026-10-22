@@ -76,3 +76,107 @@ if (typeof window !== 'undefined' && !window.localStorage) {
     },
   };
 }
+
+// Obsidian also extends the DOM prototypes (see obsidian.d.ts) and exposes the
+// focused window/document as globals. Components and the dnd layer use these.
+if (!('win' in Node.prototype)) {
+  Object.defineProperties(Node.prototype, {
+    doc: {
+      get() {
+        return this.ownerDocument ?? this;
+      },
+      configurable: true,
+    },
+    win: {
+      get() {
+        return (this.ownerDocument ?? this).defaultView;
+      },
+      configurable: true,
+    },
+    instanceOf: {
+      value: function (type: new (...args: any[]) => unknown) {
+        return this instanceof type;
+      },
+      enumerable: false,
+    },
+    // Obsidian fires this once the node is attached to a document; poll for it
+    // with a MutationObserver when it isn't attached yet.
+    onNodeInserted: {
+      value: function (listener: () => void, once?: boolean) {
+        let done = false;
+        const fire = () => {
+          if (done) return;
+          if (once) done = true;
+          listener();
+        };
+        if (this.isConnected) {
+          queueMicrotask(fire);
+          return () => (done = true);
+        }
+        const observer = new MutationObserver(() => {
+          if (!this.isConnected) return;
+          observer.disconnect();
+          fire();
+        });
+        observer.observe(document, { childList: true, subtree: true });
+        return () => {
+          done = true;
+          observer.disconnect();
+        };
+      },
+      enumerable: false,
+    },
+  });
+
+  Object.defineProperties(Element.prototype, {
+    addClass: {
+      value: function (...classes: string[]) {
+        this.classList.add(...classes);
+      },
+      enumerable: false,
+    },
+    removeClass: {
+      value: function (...classes: string[]) {
+        this.classList.remove(...classes);
+      },
+      enumerable: false,
+    },
+    hasClass: {
+      value: function (cls: string) {
+        return this.classList.contains(cls);
+      },
+      enumerable: false,
+    },
+    toggleClass: {
+      value: function (cls: string, value: boolean) {
+        this.classList.toggle(cls, value);
+      },
+      enumerable: false,
+    },
+  });
+
+  Object.defineProperty(Event.prototype, 'targetNode', {
+    get() {
+      return this.target;
+    },
+    configurable: true,
+  });
+}
+
+if (typeof window !== 'undefined') {
+  (globalThis as any).activeWindow = window;
+  (globalThis as any).activeDocument = document;
+}
+
+// jsdom has no layout, so these observers never fire; tests that need geometry
+// stub getBoundingClientRect instead.
+class NoopObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return [];
+  }
+}
+(globalThis as any).ResizeObserver ??= NoopObserver;
+(globalThis as any).IntersectionObserver ??= NoopObserver;
