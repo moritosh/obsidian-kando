@@ -14,10 +14,7 @@ declare const Fragment: import('preact').FunctionComponent<Record<string, never>
 declare function h(
   type: string,
   props:
-    | (import('preact/src/jsx').JSXInternal.HTMLAttributes &
-        import('preact/src/jsx').JSXInternal.SVGAttributes &
-        Record<string, any>)
-    | null,
+    (import('preact').HTMLAttributes & import('preact').SVGAttributes & Record<string, any>) | null,
   ...children: import('preact').ComponentChildren[]
 ): import('preact').VNode<any>;
 declare function h<P>(

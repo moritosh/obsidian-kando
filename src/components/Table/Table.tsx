@@ -1,10 +1,4 @@
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { flexRender, useTable } from '@tanstack/react-table';
 import update from 'immutability-helper';
 import { useEffect, useMemo, useRef } from 'preact/compat';
 import { IntersectionObserverHandler } from 'src/dnd/managers/ScrollManager';
@@ -15,11 +9,11 @@ import { Icon } from '../Icon/Icon';
 import { IntersectionObserverContext } from '../context';
 import { c } from '../helpers';
 import { Board } from '../types';
-import { fuzzyAnyFilter, useTableColumns } from './helpers';
+import { features, fuzzyAnyFilter, useTableColumns } from './helpers';
 
 function useIntersectionObserver() {
-  const observerRef = useRef<IntersectionObserver>();
-  const targetRef = useRef<HTMLElement>();
+  const observerRef = useRef<IntersectionObserver>(undefined);
+  const targetRef = useRef<HTMLElement>(undefined);
   const handlers = useRef<WeakMap<HTMLElement, IntersectionObserverHandler>>(new WeakMap());
   const queueRef = useRef<HTMLElement[]>([]);
 
@@ -93,7 +87,8 @@ export function TableView({
 }) {
   const { bindObserver, context } = useIntersectionObserver();
   const { data, columns, state, setSorting } = useTableColumns(boardData, stateManager);
-  const table = useReactTable({
+  const table = useTable({
+    features,
     data,
     columns,
     state,
@@ -105,11 +100,8 @@ export function TableView({
     // @ts-ignore
     columnResizeDirection: stateManager.app.vault.getConfig('rightToLeft') ? 'rtl' : 'ltr',
     onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
-  const tableState = table.getState();
+  const tableState = table.state;
 
   const dbTimer = useRef(-1);
   useEffect(() => {
@@ -197,15 +189,14 @@ export function TableView({
           <tbody>
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => {
+                {row.getAllCells().map((cell) => {
                   return (
                     <td
                       key={cell.id}
                       className={classcat({
                         'mod-has-icon': cell.column.id === 'lane',
-                        'mod-search-match': row.columnFiltersMeta[cell.column.id]
-                          ? (row.columnFiltersMeta[cell.column.id] as any).itemRank.passed
-                          : false,
+                        'mod-search-match':
+                          row.columnFiltersMeta[cell.column.id]?.itemRank.passed ?? false,
                       })}
                     >
                       <div

@@ -1,5 +1,6 @@
 import { Menu } from 'obsidian';
-import { JSX, memo, useCallback, useContext, useState } from 'preact/compat';
+import { MouseEventHandler } from 'preact';
+import { memo, useCallback, useContext, useState } from 'preact/compat';
 import { ExplicitPathContext } from 'src/dnd/components/context';
 import { moveEntity } from 'src/dnd/util/data';
 import { classcat, isEqual } from 'src/helpers/util';
@@ -62,7 +63,7 @@ export const ItemCell = memo(
       path,
     });
 
-    const onContextMenu: JSX.MouseEventHandler<HTMLDivElement> = useCallback(
+    const onContextMenu: MouseEventHandler<HTMLDivElement> = useCallback(
       (e) => {
         if (isEditing(editState)) return;
         if (
@@ -77,7 +78,7 @@ export const ItemCell = memo(
       [showItemMenu, editState]
     );
 
-    const onDoubleClick: JSX.MouseEventHandler<HTMLDivElement> = useCallback((e) => {
+    const onDoubleClick: MouseEventHandler<HTMLDivElement> = useCallback((e) => {
       setEditState({ x: e.clientX, y: e.clientY });
     }, []);
 

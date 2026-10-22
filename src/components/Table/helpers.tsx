@@ -1,10 +1,19 @@
-import { compareItems, rankItem, rankings } from '@tanstack/match-sorter-utils';
+import { RankingInfo, compareItems, rankItem, rankings } from '@tanstack/match-sorter-utils';
 import {
   ColumnDef,
   FilterFn,
   OnChangeFn,
+  Row,
   SortingState,
+  columnFilteringFeature,
+  columnResizingFeature,
+  columnSizingFeature,
   createColumnHelper,
+  createFilteredRowModel,
+  createSortedRowModel,
+  globalFilteringFeature,
+  rowSortingFeature,
+  tableFeatures,
 } from '@tanstack/react-table';
 import moment from 'moment';
 import { useCallback, useContext, useMemo, useRef, useState } from 'preact/hooks';
@@ -22,9 +31,22 @@ import { Board, Lane } from '../types';
 import { DateCell, ItemCell, LaneCell } from './Cells';
 import { TableData, TableItem } from './types';
 
-export const columnHelper = createColumnHelper<TableItem>();
+export const features = tableFeatures({
+  columnFilteringFeature,
+  globalFilteringFeature,
+  rowSortingFeature,
+  columnSizingFeature,
+  columnResizingFeature,
+  filteredRowModel: createFilteredRowModel(),
+  sortedRowModel: createSortedRowModel(),
+  filterMeta: {} as { itemRank: RankingInfo },
+});
 
-export const fuzzyAnyFilter: FilterFn<TableItem> = (row, columnId, search, addMeta) => {
+type Features = typeof features;
+
+export const columnHelper = createColumnHelper<Features, TableItem>();
+
+export const fuzzyAnyFilter: FilterFn<Features, TableItem> = (row, columnId, search, addMeta) => {
   const val = row.getValue(columnId) as any;
 
   if (val === null) return false;
@@ -34,18 +56,22 @@ export const fuzzyAnyFilter: FilterFn<TableItem> = (row, columnId, search, addMe
   const itemRank = rankItem(str, search, {
     threshold: rankings.CONTAINS,
   });
-  addMeta({ itemRank });
+  addMeta?.({ itemRank });
   return itemRank.passed;
 };
 
-export const fuzzySort = (rowA: any, rowB: any, columnId: string): number | null => {
+export const fuzzySort = (
+  rowA: Row<Features, TableItem>,
+  rowB: Row<Features, TableItem>,
+  columnId: string
+): number | null => {
   if (!rowA.columnFiltersMeta[columnId] && !rowB.columnFiltersMeta[columnId]) return null;
   if (!rowA.columnFiltersMeta[columnId]) return -1;
   if (!rowB.columnFiltersMeta[columnId]) return 1;
 
   return compareItems(
-    (rowA.columnFiltersMeta[columnId] as any)?.itemRank,
-    (rowB.columnFiltersMeta[columnId] as any)?.itemRank
+    rowA.columnFiltersMeta[columnId].itemRank,
+    rowB.columnFiltersMeta[columnId].itemRank
   );
 };
 
@@ -112,7 +138,9 @@ export function useTableData(board: Board, stateManager: StateManager): TableDat
   }, [board]);
 }
 
-export const baseColumns = (sizing: Record<string, number>): ColumnDef<TableItem, any>[] => [
+export const baseColumns = (
+  sizing: Record<string, number>
+): ColumnDef<Features, TableItem, any>[] => [
   columnHelper.accessor((row) => row.item.data.title, {
     id: 'card',
     cell: (info) => {
@@ -120,7 +148,7 @@ export const baseColumns = (sizing: Record<string, number>): ColumnDef<TableItem
       return <ItemCell item={item} lane={lane} path={path} />;
     },
     header: () => t('Card'),
-    sortingFn: (a, b, id) => {
+    sortFn: (a, b, id) => {
       const sorted = fuzzySort(a, b, id);
       if (sorted === null) {
         return defaultSort(a.getValue(id), b.getValue(id));
@@ -136,7 +164,7 @@ export const baseColumns = (sizing: Record<string, number>): ColumnDef<TableItem
       return <LaneCell lane={lane} path={path} />;
     },
     header: () => t('List'),
-    sortingFn: (a, b, id) => {
+    sortFn: (a, b, id) => {
       const sorted = fuzzySort(a, b, id);
       if (sorted === null) {
         return defaultSort(a.getValue(id), b.getValue(id));
@@ -177,7 +205,7 @@ export function useTableColumns(boardData: Board, stateManager: StateManager) {
     stateManager
   );
 
-  const withMetadata: ColumnDef<TableItem, any>[] = useMemo(() => {
+  const withMetadata: ColumnDef<Features, TableItem, any>[] = useMemo(() => {
     const columns = [...baseColumns(tableSizing)];
     for (const key of metadata) {
       switch (key) {
@@ -200,7 +228,7 @@ export function useTableColumns(boardData: Board, stateManager: StateManager) {
                   );
                 },
                 sortUndefined: false,
-                sortingFn: (a, b, id) => {
+                sortFn: (a, b, id) => {
                   const sorted = fuzzySort(a, b, id);
                   if (sorted === null) {
                     const dateA = a.getValue(id) as moment.Moment;
@@ -227,13 +255,13 @@ export function useTableColumns(boardData: Board, stateManager: StateManager) {
                 id: 'card-tags',
                 size: tableSizing['card-tags'],
                 cell: (info) => {
-                  const searchQuery = info.table.getState().globalFilter;
+                  const searchQuery = info.table.store.state.globalFilter;
                   const tags = info.getValue();
                   if (!tags?.length) return null;
                   return <Tags tags={tags} searchQuery={searchQuery} />;
                 },
                 sortUndefined: false,
-                sortingFn: (a, b, id) => {
+                sortFn: (a, b, id) => {
                   const sorted = fuzzySort(a, b, id);
                   if (sorted === null) {
                     const tagsA = a.getValue<string[] | undefined>(id);
@@ -326,7 +354,7 @@ export function useTableColumns(boardData: Board, stateManager: StateManager) {
               );
             },
             sortDescFirst: false,
-            sortingFn: (a, b, id) => {
+            sortFn: (a, b, id) => {
               const valA = a.getValue(id) as any;
               const valB = b.getValue(id) as any;
 
@@ -368,14 +396,14 @@ export function useTableColumns(boardData: Board, stateManager: StateManager) {
             cell: (info) => {
               const val = info.getValue();
               if (!val) return null;
-              const searchQuery = info.table.getState().globalFilter;
+              const searchQuery = info.table.store.state.globalFilter;
               if (key === 'tags') {
                 return <Tags searchQuery={searchQuery} tags={val.value as string[]} alwaysShow />;
               }
               return <MetadataValue data={val} searchQuery={searchQuery} />;
             },
             sortDescFirst: false,
-            sortingFn: (a, b, id) => {
+            sortFn: (a, b, id) => {
               const valA = a.getValue(id) as any;
               const valB = b.getValue(id) as any;
 

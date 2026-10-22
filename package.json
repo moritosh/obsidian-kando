@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@tanstack/match-sorter-utils": "9.2.6",
-    "@tanstack/react-table": "8.21.3",
+    "@tanstack/react-table": "9.3.1",
     "box-intersect": "1.0.2",
     "choices.js": "11.2.4",
     "colord": "2.10.0",
@@ -75,7 +75,7 @@
     "micromark-util-types": "2.0.3",
     "monkey-around": "3.0.0",
     "obsidian-daily-notes-interface": "0.9.5",
-    "preact": "10.29.8",
+    "preact": "11.0.1",
     "react": "npm:@preact/compat@18.3.2",
     "react-colorful": "5.8.1",
     "react-cool-onclickoutside": "1.7.0",

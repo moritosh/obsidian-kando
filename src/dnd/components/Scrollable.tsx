@@ -15,7 +15,7 @@ export function Scrollable({ scrollRef, triggerTypes, children }: ScrollContextP
   const scopeId = useContext(ScopeIdContext);
   const parentScrollManager = useContext(ScrollManagerContext);
 
-  const managerRef = useRef<ScrollManager>();
+  const managerRef = useRef<ScrollManager>(undefined);
 
   const scrollManager = useMemo(() => {
     if (dndManager) {

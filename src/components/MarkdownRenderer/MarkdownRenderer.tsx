@@ -239,7 +239,7 @@ export const MarkdownRenderer = memo(function MarkdownPreviewRenderer({
   const getTagColor = useGetTagColorFn(stateManager);
   const getDateColor = useGetDateColorFn(stateManager);
 
-  const renderer = useRef<BasicMarkdownRenderer>();
+  const renderer = useRef<BasicMarkdownRenderer>(undefined);
   const elRef = useRef<HTMLDivElement>(null);
 
   // Reset virtualization if this entity is a managed entity and has changed sort order

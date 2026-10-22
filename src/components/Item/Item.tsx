@@ -1,13 +1,5 @@
-import {
-  JSX,
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/compat';
+import { MouseEventHandler } from 'preact';
+import { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'preact/compat';
 import { Droppable, useNestedEntityPath } from 'src/dnd/components/Droppable';
 import { DndManagerContext } from 'src/dnd/components/context';
 import { useDragHandle } from 'src/dnd/managers/DragManager';
@@ -78,7 +70,7 @@ const ItemInner = memo(function ItemInner({
     path,
   });
 
-  const onContextMenu: JSX.MouseEventHandler<HTMLDivElement> = useCallback(
+  const onContextMenu: MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       if (isEditing(editState)) return;
       if (
@@ -92,7 +84,7 @@ const ItemInner = memo(function ItemInner({
     [showItemMenu, editState]
   );
 
-  const onDoubleClick: JSX.MouseEventHandler<HTMLDivElement> = useCallback(
+  const onDoubleClick: MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => setEditState({ x: e.clientX, y: e.clientY }),
     [setEditState]
   );

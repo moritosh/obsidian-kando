@@ -15,7 +15,7 @@ export function StaticSortable(props: SortableProps) {
 
 export function Sortable({ axis, children, onSortChange }: SortableProps) {
   const dndManager = useContext(DndManagerContext);
-  const managerRef = useRef<SortManager>();
+  const managerRef = useRef<SortManager>(undefined);
   const sortManager = useMemo(() => {
     if (dndManager) {
       if (managerRef.current) {

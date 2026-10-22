@@ -38,7 +38,7 @@ export const Droppable = memo(function Droppable({
   const parentEntityManager = useContext(EntityManagerContext);
   const parentScrollManager = useContext(ScrollManagerContext);
   const dataRef = useRef(data);
-  const managerRef = useRef<EntityManager>();
+  const managerRef = useRef<EntityManager>(undefined);
 
   dataRef.current = data;
 
