@@ -45,7 +45,7 @@ Add the changes under `### Unreleased` in the changelog below, commit, then run 
 
 ## Changelog
 
-### Unreleased
+### 1.2.2
 
 - Updated dependencies, including Preact 11.1.0.
 
