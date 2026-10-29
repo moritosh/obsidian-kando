@@ -45,6 +45,10 @@ Add the changes under `### Unreleased` in the changelog below, commit, then run 
 
 ## Changelog
 
+### Unreleased
+
+- Updated dependencies, including Preact 11.1.0.
+
 ### 1.2.1
 
 - Cards on mobile have the same rounded corners as on desktop. They had turned into pills, because they took the radius Obsidian gives text inputs, which is touch-sized on mobile.
